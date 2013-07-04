@@ -1,11 +1,11 @@
 "use strict";
 
-var crypto = require('crypto'),
+require('buffertools');
+
+var constants = require('./lib/constants.js'),
+    crypto = require('crypto'),
     events = require('events'),
     util = require('util');
-
-var DEFAULT_NUMBER_OF_NODES_PER_K_BUCKET = 20,
-    DEFAULT_NUMBER_OF_NODES_TO_PING = 3;
 
 var KBucket = module.exports = function KBucket (options) {
     var self = this;
@@ -27,3 +27,24 @@ var KBucket = module.exports = function KBucket (options) {
 };
 
 util.inherits(KBucket, events.EventEmitter);
+
+KBucket.prototype.add = function add (contact) {
+    var self = this;
+
+    // check if the contact already exists
+    var index = self.indexOf(contact);
+    if (index >= 0) return self;
+
+    self.bucket.push(contact);
+    return self;
+};
+
+// Returns the index of the contact if it exists
+// **NOTE**: indexOf() does not compare vectorClock
+KBucket.prototype.indexOf = function indexOf (contact) {
+    var self = this;
+    for (var i = 0; i < self.bucket.length; i++) {
+        if (self.bucket[i].id.equals(contact.id)) return i;
+    }
+    return -1;
+};
