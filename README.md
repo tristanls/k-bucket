@@ -18,7 +18,7 @@ _TODO:_ Write an overview of Kademlia DHT and describe why to care about a K-buc
 
 _TODO:_ Define `contact` and give context for it
 
-_TODO:_ Define `contact.id` and give context for it
+_TODO:_ Define `contact.id` and give context for it (highlight that it does not need to be a SHA-1 id, but any buffer will do; they don't even need to be the same length)
 
 _TODO:_ Define `contact.vectorClock` and give context for it
 
