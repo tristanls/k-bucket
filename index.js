@@ -9,10 +9,11 @@ var DEFAULT_NUMBER_OF_NODES_PER_K_BUCKET = 20,
 
 var KBucket = module.exports = function KBucket (options) {
     var self = this;
+    options = options || {};
     events.EventEmitter.call(self);
 
     self.bucket = [];
-    self.localNodeId = crypto.createHash('sha1').digest();
+    self.localNodeId = options.localNodeId || crypto.createHash('sha1').digest();
 
     // V8 hints
     self.dontSplit = null;
