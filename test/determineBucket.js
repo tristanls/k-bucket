@@ -45,3 +45,17 @@ test['id 01000001, bitIndex 7, should be high'] = function (test) {
     test.equal(kBucket.determineBucket(new Buffer("41", "hex"), 7), 1);
     test.done();
 };
+
+test['id 0100000100000000, bitIndex 7, should be high'] = function (test) {
+    test.expect(1);
+    var kBucket = new KBucket();
+    test.equal(kBucket.determineBucket(new Buffer("4100", "hex"), 7), 1);
+    test.done();
+};
+
+test['id 000000000100000100000000, bitIndex 15, should be high'] = function (test) {
+    test.expect(1);
+    var kBucket = new KBucket();
+    test.equal(kBucket.determineBucket(new Buffer("004100", "hex"), 15), 1);
+    test.done();
+};
