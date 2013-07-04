@@ -35,7 +35,12 @@ KBucket.prototype.add = function add (contact) {
     var index = self.indexOf(contact);
     if (index >= 0) return self;
 
+    if (self.bucket.length >= constants.DEFAULT_NUMBER_OF_NODES_PER_K_BUCKET) {
+        return self.splitAndAdd(contact);
+    }
+    
     self.bucket.push(contact);
+    
     return self;
 };
 
@@ -47,4 +52,16 @@ KBucket.prototype.indexOf = function indexOf (contact) {
         if (self.bucket[i].id.equals(contact.id)) return i;
     }
     return -1;
+};
+
+// Splits the bucket, redistributes contacts to the new buckets, and marks the
+// bucket that was split as an inner node of the binary tree of buckets by
+// setting self.bucket = undefined;
+KBucket.prototype.splitAndAdd = function splitAndAdd (contact) {
+    var self = this;
+    self.low = new KBucket({localNodeId: self.localNodeId});
+    self.high = new KBucket({localNodeId: self.localNodeId});
+
+    self.bucket = undefined; // mark as inner tree node
+    return self;
 };
