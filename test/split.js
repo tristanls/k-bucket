@@ -42,3 +42,29 @@ test['adding maximum number of contacts (per K-bucket) + 1 [' +
     test.ok(!kBucket.bucket);
     test.done();
 };
+
+test['split buckets contain all added contacts'] = function (test) {
+    test.expect(constants.DEFAULT_NUMBER_OF_NODES_PER_K_BUCKET + 2);
+    var kBucket = new KBucket();
+    var foundContact = [];
+    for (var i = 0; i < constants.DEFAULT_NUMBER_OF_NODES_PER_K_BUCKET + 1; i++) {
+        kBucket.add({id: new Buffer("" + i)});
+        foundContact[i] = false;
+    }
+    var traverse = function (node) {
+        if (!node.bucket) {
+            traverse(node.low);
+            traverse(node.high);
+        } else {
+            node.bucket.forEach(function (contact) {
+                foundContact[contact.id.toString()] = true;
+            });
+        }
+    };
+    traverse(kBucket);
+    for (i = 0; i < foundContact.length; i++) {
+        test.ok(foundContact[i]);
+    }
+    test.ok(!kBucket.bucket);
+    test.done();
+};

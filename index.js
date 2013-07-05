@@ -29,26 +29,22 @@ var KBucket = module.exports = function KBucket (options) {
 util.inherits(KBucket, events.EventEmitter);
 
 // contact: *required* the contact object to add
-// id: a Buffer we use to walk the KBucket binary tree
 // bitIndex: the bitIndex to which byte to check in the Buffer for navigating the
 //          binary tree
-KBucket.prototype.add = function add (contact, id, bitIndex) {
+KBucket.prototype.add = function add (contact, bitIndex) {
     var self = this;
-
-    // console.dir(self);
 
     // first check whether we are an inner node or a leaf (with bucket contents)
     if (!self.bucket) {
         // this is not a leaf node but an inner node with 'low' and 'high'
         // branches; we will check the appropriate byte of the identifier and
         // delegate to the appropriate node for further processing
-        id = id || contact.id;
         bitIndex = bitIndex || 0;
 
-        if (id[bitIndex++] < 0x80) {
-            return self.low.add(contact, id, bitIndex);
+        if (self.determineBucket(contact.id, bitIndex++) < 0) {
+            return self.low.add(contact, bitIndex);
         } else {
-            return self.high.add(contact, id, bitIndex);
+            return self.high.add(contact, bitIndex);
         }
     }
 
@@ -57,7 +53,7 @@ KBucket.prototype.add = function add (contact, id, bitIndex) {
     if (index >= 0) return self;
 
     if (self.bucket.length >= constants.DEFAULT_NUMBER_OF_NODES_PER_K_BUCKET) {
-        return self.splitAndAdd(contact);
+        return self.splitAndAdd(contact, bitIndex);
     }
     
     self.bucket.push(contact);
@@ -79,21 +75,18 @@ KBucket.prototype.indexOf = function indexOf (contact) {
 // bucket that was split as an inner node of the binary tree of buckets by
 // setting self.bucket = undefined;
 // contact: *required* the contact object to add
-// id: a Buffer we use to walk the KBucket binary tree
 // bitIndex: the bitIndex to which byte to check in the Buffer for navigating the
 //          binary tree
-KBucket.prototype.splitAndAdd = function splitAndAdd (contact, id, bitIndex) {
+KBucket.prototype.splitAndAdd = function splitAndAdd (contact, bitIndex) {
     var self = this;
     self.low = new KBucket({localNodeId: self.localNodeId});
     self.high = new KBucket({localNodeId: self.localNodeId});
 
-    id = id || contact.id;
     bitIndex = bitIndex || 0;
 
     // redistribute existing contacts amongst the two newly created buckets
     self.bucket.forEach(function (storedContact) {
-        // TODO: add extra check for identifiers that are too short
-        if (storedContact.id[bitIndex] < 0x80) {
+        if (self.determineBucket(storedContact.id, bitIndex) < 0) {
             self.low.add(storedContact);
         } else {
             self.high.add(storedContact);
@@ -103,7 +96,7 @@ KBucket.prototype.splitAndAdd = function splitAndAdd (contact, id, bitIndex) {
     self.bucket = undefined; // mark as inner tree node
     
     // add the contact being added
-    self.add(contact, id, bitIndex);
+    self.add(contact, bitIndex);
 
     return self;
 };
@@ -143,6 +136,6 @@ KBucket.prototype.determineBucket = function determineBucket (id, bitIndex) {
     if (byteUnderConsideration & Math.pow(2, (7 - bitIndexWithinByte))) {
         return 1;
     }
-    
+
     return -1;
 };
