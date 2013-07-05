@@ -94,6 +94,16 @@ KBucket.prototype.splitAndAdd = function splitAndAdd (contact, bitIndex) {
     });
 
     self.bucket = undefined; // mark as inner tree node
+
+    // don't split the "far away" bucket
+    // we check where the local node would end up and mark the other one as
+    // "dontSplit" (i.e. "far away")
+    if (self.determineBucket(self.localNodeId, bitIndex) < 0) {
+        // local node belongs to "low" bucket, so mark the other one
+        self.high.dontSplit = true;
+    } else {
+        self.low.dontSplit = true;
+    }
     
     // add the contact being added
     self.add(contact, bitIndex);
