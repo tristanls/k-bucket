@@ -45,11 +45,15 @@ test['adding maximum number of contacts (per K-bucket) + 1 [' +
 
 test['split buckets contain all added contacts'] = function (test) {
     test.expect(constants.DEFAULT_NUMBER_OF_NODES_PER_K_BUCKET + 2);
-    var kBucket = new KBucket();
-    var foundContact = [];
+    var kBucket = new KBucket({localNodeId: new Buffer('00', 'hex')});
+    var foundContact = {};
     for (var i = 0; i < constants.DEFAULT_NUMBER_OF_NODES_PER_K_BUCKET + 1; i++) {
-        kBucket.add({id: new Buffer("" + i)});
-        foundContact[i] = false;
+        var iString = i.toString('16');
+        if (iString.length < 2) {
+            iString = '0' + iString;
+        }
+        kBucket.add({id: new Buffer(iString, 'hex')});
+        foundContact[iString] = false;
     }
     var traverse = function (node) {
         if (!node.bucket) {
@@ -57,14 +61,14 @@ test['split buckets contain all added contacts'] = function (test) {
             traverse(node.high);
         } else {
             node.bucket.forEach(function (contact) {
-                foundContact[contact.id.toString()] = true;
+                foundContact[contact.id.toString('hex')] = true;
             });
         }
     };
     traverse(kBucket);
-    for (i = 0; i < foundContact.length; i++) {
-        test.ok(foundContact[i]);
-    }
+    Object.keys(foundContact).forEach(function (key) {
+        test.ok(foundContact[key], key);
+    });
     test.ok(!kBucket.bucket);
     test.done();
 };

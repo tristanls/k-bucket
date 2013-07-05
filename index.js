@@ -60,6 +60,21 @@ KBucket.prototype.add = function add (contact, bitIndex) {
         self.bucket.push(contact);
         return self;
     }
+
+    // the bucket is full
+    if (self.dontSplit) {
+        // we are not allowed to split the bucket
+        // we need to ping the first constants.DEFAULT_NUMBER_OF_NODES_TO_PING
+        // in order to determine if they are alive
+        // only if one of the pinged nodes does not respond, can the new contact
+        // be added (this prevents DoS flodding with new invalid contacts)
+
+        // TODO: figure out how to implement handing over PING to someone else
+        //       while at the same time being able to delete an old node later
+        //       asynchronously
+
+        return self;
+    }
     
     return self.splitAndAdd(contact, bitIndex);
 };
