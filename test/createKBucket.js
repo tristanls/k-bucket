@@ -29,3 +29,10 @@ test['localNodeId is a Buffer populated from options if options.localNodeId Stri
     test.deepEqual(kBucket.localNodeId, new Buffer("some identifier"));
     test.done();
 };
+
+test['root is \'self\' if not provided'] = function (test) {
+    test.expect(1);
+    var kBucket = new KBucket();
+    test.equal(kBucket.root, kBucket);
+    test.done();
+};

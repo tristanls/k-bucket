@@ -20,6 +20,7 @@ var KBucket = module.exports = function KBucket (options) {
     if (!(self.localNodeId instanceof Buffer)) {
         self.localNodeId = new Buffer(self.localNodeId);
     }
+    self.root = options.root || self;
 
     // V8 hints
     self.dontSplit = null;
@@ -68,11 +69,9 @@ KBucket.prototype.add = function add (contact, bitIndex) {
         // in order to determine if they are alive
         // only if one of the pinged nodes does not respond, can the new contact
         // be added (this prevents DoS flodding with new invalid contacts)
-
-        // TODO: figure out how to implement handing over PING to someone else
-        //       while at the same time being able to delete an old node later
-        //       asynchronously
-
+        self.root.emit('ping', 
+            self.bucket.slice(0, constants.DEFAULT_NUMBER_OF_NODES_TO_PING),
+            contact);
         return self;
     }
     
@@ -136,8 +135,8 @@ KBucket.prototype.indexOf = function indexOf (contact) {
 //          binary tree
 KBucket.prototype.splitAndAdd = function splitAndAdd (contact, bitIndex) {
     var self = this;
-    self.low = new KBucket({localNodeId: self.localNodeId});
-    self.high = new KBucket({localNodeId: self.localNodeId});
+    self.low = new KBucket({localNodeId: self.localNodeId, root: self.root});
+    self.high = new KBucket({localNodeId: self.localNodeId, root: self.root});
 
     bitIndex = bitIndex || 0;
 

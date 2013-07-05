@@ -40,3 +40,28 @@ test['adding same contact moves it to the end of the bucket ' +
     test.equal(kBucket.bucket[1], contact); // most-recently-contacted end
     test.done();
 };
+
+test['adding contact to bucket that can\'t be split results in emitting' +
+     ' "ping" event'] = function (test) {
+    var i, iString, j;
+    test.expect(constants.DEFAULT_NUMBER_OF_NODES_TO_PING + 2);
+    var kBucket = new KBucket({localNodeId: new Buffer('0000', 'hex')});
+    kBucket.on('ping', function (contacts, replacement) {
+        test.equal(contacts.length, constants.DEFAULT_NUMBER_OF_NODES_TO_PING);
+        // console.dir(kBucket.high.bucket[0]);
+        for (var i = 0; i < constants.DEFAULT_NUMBER_OF_NODES_TO_PING; i++) {
+            // the least recently contacted end of the bucket should be pinged
+            test.equal(contacts[i], kBucket.high.bucket[i]);
+        }
+        test.deepEqual(replacement, {id: new Buffer(iString, 'hex')})
+        test.done();
+    });
+    for (var j = 0; j < constants.DEFAULT_NUMBER_OF_NODES_PER_K_BUCKET + 1; j++) {
+        iString = j.toString('16');
+        if (iString.length < 2) {
+            iString = '0' + iString;
+        }
+        iString = '80' + iString; // make sure all go into "far away" bucket
+        kBucket.add({id: new Buffer(iString, 'hex')});
+    }
+};
