@@ -81,39 +81,33 @@ KBucket.prototype.add = function add (contact, bitIndex) {
 KBucket.prototype.closest = function closest (contact, n, bitIndex) {
     var self = this;
 
-    var results = [];
+    var contacts;
 
     if (!self.bucket) {
         bitIndex = bitIndex || 0;
         
         if (self.determineBucket(contact.id, bitIndex++) < 0) {
-            results = self.low.closest(contact, n, bitIndex);
-            if (results.length < n) {
-                results = results.concat(self.high.closest(contact, n, bitIndex));
+            contacts = self.low.closest(contact, n, bitIndex);
+            if (contacts.length < n) {
+                contacts = contacts.concat(self.high.closest(contact, n, bitIndex));
             }
         } else {
-            results = self.high.closest(contact, n, bitIndex);
-            if (results.length < n) {
-                results = results.concat(self.low.closest(contact, n, bitIndex));
+            contacts = self.high.closest(contact, n, bitIndex);
+            if (contacts.length < n) {
+                contacts = contacts.concat(self.low.closest(contact, n, bitIndex));
             }
         }
-        return results.slice(0, n);
+        return contacts.slice(0, n);
     }
 
-    var contacts = self.bucket.slice();
+    contacts = self.bucket.slice();
+    contacts.forEach(function (storedContact) {
+        storedContact.distance = self.distance(storedContact.id, contact.id);
+    });
 
-    // contacts.forEach(function (storedContact) {
-    //     var max = Math.max(storedContact.id.length, contact.id.length);
-    //     var accumulator = '';
-    //     for (var i = 0; i < max; i++) {
-    //         var storedContactValue = storedContact.id[i] || 0;
-    //         var contactValue = contact.id[i] || 0;
-    //         var xor = storedContactValue ^ contactValue;
+    contacts.sort(function (a, b) {return a.distance - b.distance;});
 
-    //     }
-    // });
-
-    return results;
+    return contacts.slice(0, n);
 };
 
 // Determines whether the id at the bitIndex is 0 or 1. If 0, returns -1, else 1
