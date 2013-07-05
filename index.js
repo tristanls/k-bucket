@@ -127,6 +127,31 @@ KBucket.prototype.indexOf = function indexOf (contact) {
     return -1;
 };
 
+// contact: *required* the contact object to remove
+// bitIndex: the bitIndex to which bit to check in the Buffer for navigating 
+//           the binary tree
+KBucket.prototype.remove = function remove (contact, bitIndex) {
+    var self = this;
+
+    // first check whether we are an inner node or a leaf (with bucket contents)
+    if (!self.bucket) {
+        // this is not a leaf node but an inner node with 'low' and 'high'
+        // branches; we will check the appropriate bit of the identifier and
+        // delegate to the appropriate node for further processing
+        bitIndex = bitIndex || 0;
+
+        if (self.determineBucket(contact.id, bitIndex++) < 0) {
+            return self.low.remove(contact, bitIndex);
+        } else {
+            return self.high.remove(contact, bitIndex);
+        }
+    }
+
+    var index = self.indexOf(contact);
+    if (index >= 0) self.bucket.splice(index, 1);
+    return self;
+};
+
 // Splits the bucket, redistributes contacts to the new buckets, and marks the
 // bucket that was split as an inner node of the binary tree of buckets by
 // setting self.bucket = undefined;
