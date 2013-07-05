@@ -56,13 +56,12 @@ KBucket.prototype.add = function add (contact, bitIndex) {
         return self;
     }
 
-    if (self.bucket.length >= constants.DEFAULT_NUMBER_OF_NODES_PER_K_BUCKET) {
-        return self.splitAndAdd(contact, bitIndex);
+    if (self.bucket.length < constants.DEFAULT_NUMBER_OF_NODES_PER_K_BUCKET) {
+        self.bucket.push(contact);
+        return self;
     }
     
-    self.bucket.push(contact);
-    
-    return self;
+    return self.splitAndAdd(contact, bitIndex);
 };
 
 // Determines whether the id at the bitIndex is 0 or 1. If 0, returns -1, else 1
