@@ -34,6 +34,35 @@ test['closest nodes are returned'] = function (test) {
     test.done();
 };
 
+test['closest nodes are returned (including exact match)'] = function (test) {
+    test.expect(3);
+    var kBucket = new KBucket();
+    kBucket.add({id: new Buffer('00', 'hex')}); // 00000000
+    kBucket.add({id: new Buffer('01', 'hex')}); // 00000001
+    kBucket.add({id: new Buffer('02', 'hex')}); // 00000010
+    kBucket.add({id: new Buffer('03', 'hex')}); // 00000011
+    kBucket.add({id: new Buffer('04', 'hex')}); // 00000100
+    kBucket.add({id: new Buffer('05', 'hex')}); // 00000101
+    kBucket.add({id: new Buffer('06', 'hex')}); // 00000110
+    kBucket.add({id: new Buffer('07', 'hex')}); // 00000111
+    kBucket.add({id: new Buffer('08', 'hex')}); // 00001000
+    kBucket.add({id: new Buffer('09', 'hex')}); // 00001001
+    kBucket.add({id: new Buffer('0a', 'hex')}); // 00001010
+    kBucket.add({id: new Buffer('0b', 'hex')}); // 00001011
+    kBucket.add({id: new Buffer('0c', 'hex')}); // 00001100
+    kBucket.add({id: new Buffer('0d', 'hex')}); // 00001101
+    kBucket.add({id: new Buffer('0e', 'hex')}); // 00001110
+    kBucket.add({id: new Buffer('0f', 'hex')}); // 00001111
+    kBucket.add({id: new Buffer('10', 'hex')}); // 00010000
+    kBucket.add({id: new Buffer('11', 'hex')}); // 00010001
+    var contact = {id: new Buffer('11', 'hex')};// 00010001
+    var contacts = kBucket.closest(contact, 3);
+    test.deepEqual(contacts[0].id, new Buffer('11', 'hex')); // distance: 00000000
+    test.deepEqual(contacts[1].id, new Buffer('10', 'hex')); // distance: 00000001
+    test.deepEqual(contacts[2].id, new Buffer('01', 'hex')); // distance: 00010000
+    test.done();
+};
+
 test['closest nodes are returned even if there isn\'t enough in one bucket'] = function (test) {
     test.expect(22);
     var i, iString;
