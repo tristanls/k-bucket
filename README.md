@@ -18,8 +18,7 @@ Kademlia DHT K-bucket implementation as a binary tree.
 var KBucket = require('k-bucket');
 
 var kBucket = new KBucket({
-    localNodeId: "my node id", /* default: random SHA-1 */
-    root: kBucket /* default: self (for internal implementation use) */
+    localNodeId: new Buffer("my node id") // default: random SHA-1
 });
 ```
 
@@ -45,81 +44,97 @@ As even more contacts are added to the "near" k-bucket, the "near" k-bucket will
 
 As more contacts are added to the "far" k-bucket and it reaches its capacity, it does not split. Instead, the k-bucket emits a "ping" event (register a listener: `kBucket.on('ping', function (oldContacts, newContact) {...});` and includes an array of old contact nodes that it hasn't heard from in a while and requires you to confirm that those contact nodes still respond (literally respond to a PING RPC). If an old contact node still responds, it should be re-added (`kBucket.add(oldContact)`) back to the k-bucket. This puts the old contact on the "recently heard from" end of the list of nodes in the k-bucket. If the old contact does not respond, it should be removed (`kBucket.remove(oldContact)`) and the new contact being added now has room to be stored (`kBucket.add(newContact)`).
 
-#### new KBucket(options)
+#### KBucket.distance(firstId, secondId)
 
-Creates a new KBucket. The `options` are:
-
-  * `localNodeId`: An optional string or a Buffer representing the local node id. If not provided, a local node id will be created via `crypto.createHash('sha1').digest()`. If a string is provided, it will be converted into a Buffer.
-  * `root`: _(reserved for internal use)_ provides a reference for to the root of the tree data structure as the k-bucket splits as new contacts are added
-
-#### kBucket.add(contact, [bitIndex])
-
-  * `contact` Object
-  * `bitIndex` Integer, Optional, Default: 0
-  * Return: Object
-
-Adds a contact to the k-bucket.
-
-#### kBucket.closest(contact, n, [bitIndex])
-
-  * `contact` Object
-  * `n` Integer
-  * `bitIndex` Integer, Optional, Default: 0
-  * Return: Array
-
-Get the n closest contacts to the provided contact. "Closest" here means: closest according to the XOR metric of the contact node id.
-
-#### kBucket.determineBucket(id, [bitIndex])
-
-  * `id` Buffer
-  * `bitIndex` Integer
-  * Return: Integer
-
-_reserved for internal use_ Determines whether the id at the bitIndex is 0 or 1. If 0, returns -1, else 1. Id is a Buffer.
-
-#### kBucket.distance(firstId, secondId)
-
-  * `firstId` Buffer
-  * `secondId` Buffer
-  * Return: Integer
+  * `firstId`: _Buffer_
+  * `secondId`: _Buffer_
+  * Return: _Integer_
 
 Finds the XOR distance between firstId and secondId.
 
+#### new KBucket(options)
+
+  * `options`:
+    * `localNodeId`: _String (base64)_ or _Buffer_ An optional String or a Buffer representing the local node id. If not provided, a local node id will be created via `crypto.createHash('sha1').digest()`. If a String is provided, it will be assumed to be base64 encoded and will be converted into a Buffer.
+    * `root`: _Object_ _(reserved for internal use)_ provides a reference to the root of the tree data structure as the k-bucket splits when new contacts are added
+
+Creates a new KBucket.
+
+#### kBucket.add(contact, [bitIndex])
+
+  * `contact`: _Object_
+    * `id`: _Buffer_ contact node id
+    * Any satellite data can be part of the `contact` object, only `id` is used
+  * `bitIndex`: _Integer_ _(Default: 0)_
+  * Return: _Object_
+
+Adds a `contact` to the k-bucket.
+
+#### kBucket.closest(contact, n, [bitIndex])
+
+  * `contact`: _Object_
+    * `id`: _Buffer_ contact node id
+    * Any satellite data can be part of the `contact` object, only `id` is used
+  * `n`: _Integer_
+  * `bitIndex`: _Integer_ _(Default: 0)_
+  * Return: _Array_
+
+Get the `n` closest contacts to the provided `contact`. "Closest" here means: closest according to the XOR metric of the `contact` node id.
+
+#### kBucket.determineBucket(id, [bitIndex])
+
+  * `id`: _Buffer_
+  * `bitIndex`: _Integer_ _(Default: 0)_
+  * Return: _Integer_
+
+_reserved for internal use_ 
+
+Determines whether the `id` at the `bitIndex` is 0 or 1. If 0, returns -1, else 1.
+
 #### kBucket.indexOf(contact)
 
-  * `contact` Object
-  * Return: Integer
+  * `contact`: _Object_
+  * Return: _Integer_
 
-Returns the index of the contact if it exists, returns -1 otherwise.
+Returns the index of the `contact` if it exists, returns -1 otherwise.
 
 #### kBucket.remove(contact, [bitIndex])
 
-  * `contact` Object
-  * `bitIndex` Integer, Optional, Default: 0
-  * Return: Object
+  * `contact`: _Object_
+    * `id`: _Buffer_ contact node id
+    * Any satellite data can be part of the `contact` object, only `id` is used
+  * `bitIndex`: _Integer_ _(Default: 0)_
+  * Return: _Object_
 
-Removes the contact.
+Removes the `contact`.
 
 #### kBucket.splitAndAdd(contact, [bitIndex])
 
-  * `contact` Object
-  * `bitIndex` Integer, Optional, Default: 0
-  * Return: Object
+  * `contact`: _Object_
+    * `id`: _Buffer_ contact node id
+    * Any satellite data can be part of the `contact` object, only `id` is used
+  * `bitIndex`: _Integer_ _(Default: 0)_
+  * Return: _Object_
 
-_reserved for internal use_ Splits the bucket, redistributes contacts to the new buckets, and marks the bucket that was split as an inner node of the binary tree of buckets by setting self.bucket = undefined. Also, marks the "far away" bucket as `dontSplit`.
+_reserved for internal use_ 
+
+Splits the bucket, redistributes contacts to the new buckets, and marks the bucket that was split as an inner node of the binary tree of buckets by setting `self.bucket = undefined`. Also, marks the "far away" bucket as `dontSplit`.
 
 #### kBucket.update(contact, index)
 
-  * `contact` Object
-  * `index` Integer
-  * Return: void
+  * `contact`: _Object_
+    * `id`: _Buffer_ contact node id
+    * Any satellite data can be part of the `contact` object, only `id` is used
+  * `index`: _Integer_
 
-_reserved for internal use_ Updates the contact and compares the vector clocks if provided. If new contact vector clock is deprecated, contact is abandoned (not added). If new contact vector clock is the same, contact is marked as moste recently contacted (by being moved to the right/end of the bucket array). If new contact vector clock is more recent, the old contact is removed and the new contact is marked as most recently contacted.
+_reserved for internal use_ 
+
+Updates the `contact` and compares the vector clocks if provided. If new `contact` vector clock is deprecated, `contact` is abandoned (not added). If new `contact` vector clock is the same, `contact` is marked as moste recently contacted (by being moved to the right/end of the bucket array). If new `contact` vector clock is more recent, the old `contact` is removed and the new contact is marked as most recently contacted.
 
 #### Event: 'ping'
 
-  * `oldContacts` _Array_ The array of contacts to ping
-  * `newContact` _Object_ The new contact to be added if one of old contacts does not respond
+  * `oldContacts`: _Array_ The array of contacts to ping
+  * `newContact`: _Object_ The new contact to be added if one of old contacts does not respond
 
 Emitted every time a contact is added that would exceed the capacity of a _don't split_ k-bucket it belongs to.
 
