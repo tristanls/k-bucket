@@ -48,7 +48,7 @@ var KBucket = module.exports = function KBucket (options) {
     self.bucket = [];
     self.localNodeId = options.localNodeId || crypto.createHash('sha1').digest();
     if (!(self.localNodeId instanceof Buffer)) {
-        self.localNodeId = new Buffer(self.localNodeId);
+        self.localNodeId = new Buffer(self.localNodeId, 'base64');
     }
     self.root = options.root || self;
 
