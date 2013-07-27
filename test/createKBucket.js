@@ -26,7 +26,7 @@ test['localNodeId is a Buffer populated from options if options.localNodeId Stri
     test.expect(2);
     var kBucket = new KBucket({localNodeId: localNodeId});
     test.ok(kBucket.localNodeId instanceof Buffer);
-    test.deepEqual(kBucket.localNodeId, new Buffer("some identifier"));
+    test.deepEqual(kBucket.localNodeId, new Buffer("some identifier", 'base64'));
     test.done();
 };
 

@@ -48,7 +48,7 @@ var KBucket = module.exports = function KBucket (options) {
     self.bucket = [];
     self.localNodeId = options.localNodeId || crypto.createHash('sha1').digest();
     if (!(self.localNodeId instanceof Buffer)) {
-        self.localNodeId = new Buffer(self.localNodeId);
+        self.localNodeId = new Buffer(self.localNodeId, 'base64');
     }
     self.root = options.root || self;
 
@@ -59,6 +59,22 @@ var KBucket = module.exports = function KBucket (options) {
 };
 
 util.inherits(KBucket, events.EventEmitter);
+
+KBucket.distance = function distance (firstId, secondId) {
+    var max = Math.max(firstId.length, secondId.length);
+    var accumulator = '';
+    for (var i = 0; i < max; i++) {
+        var maxDistance = false;
+        if (firstId[i] === undefined) maxDistance = true;
+        if (secondId[i] === undefined) maxDistance = true;
+        if (maxDistance) {
+            accumulator += (255).toString(16);
+        } else {
+            accumulator += (firstId[i] ^ secondId[i]).toString(16);
+        }
+    }
+    return parseInt(accumulator, 16);
+};
 
 // contact: *required* the contact object to add
 // bitIndex: the bitIndex to which bit to check in the Buffer for navigating 
@@ -132,7 +148,7 @@ KBucket.prototype.closest = function closest (contact, n, bitIndex) {
 
     contacts = self.bucket.slice();
     contacts.forEach(function (storedContact) {
-        storedContact.distance = self.distance(storedContact.id, contact.id);
+        storedContact.distance = KBucket.distance(storedContact.id, contact.id);
     });
 
     contacts.sort(function (a, b) {return a.distance - b.distance;});
@@ -177,24 +193,6 @@ KBucket.prototype.determineBucket = function determineBucket (id, bitIndex) {
     }
 
     return -1;
-};
-
-KBucket.prototype.distance = function distance (firstId, secondId) {
-    var self = this;
-
-    var max = Math.max(firstId.length, secondId.length);
-    var accumulator = '';
-    for (var i = 0; i < max; i++) {
-        var maxDistance = false;
-        if (firstId[i] === undefined) maxDistance = true;
-        if (secondId[i] === undefined) maxDistance = true;
-        if (maxDistance) {
-            accumulator += (255).toString(16);
-        } else {
-            accumulator += (firstId[i] ^ secondId[i]).toString(16);
-        }
-    }
-    return parseInt(accumulator, 16);
 };
 
 // Returns the index of the contact if it exists
