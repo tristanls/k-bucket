@@ -46,9 +46,9 @@ As more contacts are added to the "far" k-bucket and it reaches its capacity, it
 
 #### KBucket.distance(firstId, secondId)
 
-  * `firstId`: _Buffer_
-  * `secondId`: _Buffer_
-  * Return: _Integer_
+  * `firstId`: _Buffer_ Buffer containing first id.
+  * `secondId`: _Buffer_ Buffer containing second id.
+  * Return: _Integer_ The XOR distance between `firstId` and `secondId`.
 
 Finds the XOR distance between firstId and secondId.
 
@@ -56,85 +56,91 @@ Finds the XOR distance between firstId and secondId.
 
   * `options`:
     * `localNodeId`: _String (base64)_ or _Buffer_ An optional String or a Buffer representing the local node id. If not provided, a local node id will be created via `crypto.createHash('sha1').digest()`. If a String is provided, it will be assumed to be base64 encoded and will be converted into a Buffer.
-    * `root`: _Object_ _(reserved for internal use)_ provides a reference to the root of the tree data structure as the k-bucket splits when new contacts are added
+    * `root`: _Object_ _**CAUTION: reserved for internal use**_ Provides a reference to the root of the tree data structure as the k-bucket splits when new contacts are added.
 
 Creates a new KBucket.
 
 #### kBucket.add(contact, [bitIndex])
 
-  * `contact`: _Object_
-    * `id`: _Buffer_ contact node id
-    * Any satellite data can be part of the `contact` object, only `id` is used
-  * `bitIndex`: _Integer_ _(Default: 0)_
-  * Return: _Object_
+  * `contact`: _Object_ The contact object to add.
+    * `id`: _Buffer_ Contact node id.
+    * Any satellite data that is part of the `contact` object will not be altered, only `id` is used.
+  * `bitIndex`: _Integer_ _(Default: 0)_ _**CAUTION: reserved for internal use**_ The bit index to which bit to check in the `id` Buffer.
+  * Return: _Object_ The k-bucket itself.
 
 Adds a `contact` to the k-bucket.
 
 #### kBucket.closest(contact, n, [bitIndex])
 
-  * `contact`: _Object_
-    * `id`: _Buffer_ contact node id
-    * Any satellite data can be part of the `contact` object, only `id` is used
-  * `n`: _Integer_
-  * `bitIndex`: _Integer_ _(Default: 0)_
-  * Return: _Array_
+  * `contact`: _Object_ The contact object to find closest contacts to.
+    * `id`: _Buffer_ Contact node id.
+    * Any satellite data that is part of the `contact` object will not be altered, only `id` is used.
+  * `n`: _Integer_ The maximum number of closest contacts to return.
+  * `bitIndex`: _Integer_ _(Default: 0)_ _**CAUTION: reserved for internal use**_  The bit index to which bit to check in the `id` Buffer.
+  * Return: _Array_ Maximum of `n` closest contacts to the `contact`.
 
 Get the `n` closest contacts to the provided `contact`. "Closest" here means: closest according to the XOR metric of the `contact` node id.
 
 #### kBucket.determineBucket(id, [bitIndex])
 
-  * `id`: _Buffer_
-  * `bitIndex`: _Integer_ _(Default: 0)_
-  * Return: _Integer_
+_**CAUTION: reserved for internal use**_
 
-_reserved for internal use_ 
+  * `id`: _Buffer_ Id to compare `localNodeId` with.
+  * `bitIndex`: _Integer_ _(Default: 0)_  The bit index to which bit to check in the `id` Buffer.
+  * Return: _Integer_ -1 if `id` at `bitIndex` is 0, 1 otherwise.
 
 Determines whether the `id` at the `bitIndex` is 0 or 1. If 0, returns -1, else 1.
 
 #### kBucket.indexOf(contact)
 
-  * `contact`: _Object_
-  * Return: _Integer_
+_**CAUTION: reserved for internal use**_
+
+  * `contact`: _Object_ The contact object.
+    * `id`: _Buffer_ Contact node id.
+    * Any satellite data that is part of the `contact` object will not be altered, only `id` is used.
+  * Return: _Integer_ Index of `contact` if it exists, -1 otherwise.
 
 Returns the index of the `contact` if it exists, returns -1 otherwise.
 
+_NOTE: `kBucket.indexOf(contact)` does not compare `contact.vectorClock`_
+
 #### kBucket.remove(contact, [bitIndex])
 
-  * `contact`: _Object_
-    * `id`: _Buffer_ contact node id
+  * `contact`: _Object_ The contact object to remove.
+    * `id`: _Buffer_ contact node id.
     * Any satellite data can be part of the `contact` object, only `id` is used
-  * `bitIndex`: _Integer_ _(Default: 0)_
-  * Return: _Object_
+  * `bitIndex`: _Integer_ _(Default: 0)_ _**CAUTION: reserved for internal use**_  The bit index to which bit to check in the `id` Buffer.
+  * Return: _Object_ The k-bucket itself.
 
 Removes the `contact`.
 
 #### kBucket.splitAndAdd(contact, [bitIndex])
 
-  * `contact`: _Object_
-    * `id`: _Buffer_ contact node id
-    * Any satellite data can be part of the `contact` object, only `id` is used
-  * `bitIndex`: _Integer_ _(Default: 0)_
-  * Return: _Object_
+_**CAUTION: reserved for internal use**_
 
-_reserved for internal use_ 
+  * `contact`: _Object_ The contact object to add.
+    * `id`: _Buffer_ Contact node id.
+    * Any satellite data that is part of the `contact` object will not be altered, only `id` is used.
+  * `bitIndex`: _Integer_ _(Default: 0)_ The bit index to which bit to check in the `id` Buffer.
+  * Return: _Object_ The k-bucket itself.
 
 Splits the bucket, redistributes contacts to the new buckets, and marks the bucket that was split as an inner node of the binary tree of buckets by setting `self.bucket = undefined`. Also, marks the "far away" bucket as `dontSplit`.
 
 #### kBucket.update(contact, index)
 
-  * `contact`: _Object_
-    * `id`: _Buffer_ contact node id
-    * Any satellite data can be part of the `contact` object, only `id` is used
-  * `index`: _Integer_
+_**CAUTION: reserved for internal use**_
 
-_reserved for internal use_ 
+  * `contact`: _Object_ The contact object to update.
+    * `id`: _Buffer_ Contact node id
+    * Any satellite data that is part of the `contact` object will not be altered, only `id` is used.
+  * `index`: _Integer_ The index in the bucket where contact exists (index has already been computed in previous calculation).
 
 Updates the `contact` and compares the vector clocks if provided. If new `contact` vector clock is deprecated, `contact` is abandoned (not added). If new `contact` vector clock is the same, `contact` is marked as moste recently contacted (by being moved to the right/end of the bucket array). If new `contact` vector clock is more recent, the old `contact` is removed and the new contact is marked as most recently contacted.
 
 #### Event: 'ping'
 
-  * `oldContacts`: _Array_ The array of contacts to ping
-  * `newContact`: _Object_ The new contact to be added if one of old contacts does not respond
+  * `oldContacts`: _Array_ The array of contacts to ping.
+  * `newContact`: _Object_ The new contact to be added if one of old contacts does not respond.
 
 Emitted every time a contact is added that would exceed the capacity of a _don't split_ k-bucket it belongs to.
 

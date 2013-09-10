@@ -124,6 +124,11 @@ KBucket.prototype.add = function add (contact, bitIndex) {
     return self.splitAndAdd(contact, bitIndex);
 };
 
+// contact: Object *required* contact object
+//   id: Buffer *require* node id
+// n: Integer *required* maximum number of closest contacts to return
+// bitIndex: Integer (Default: 0) 
+// Return: Array of maximum of `n` closest contacts to the `contact`
 KBucket.prototype.closest = function closest (contact, n, bitIndex) {
     var self = this;
 
