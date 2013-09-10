@@ -63,7 +63,7 @@ Finds the XOR distance between firstId and secondId.
 #### new KBucket(options)
 
   * `options`:
-    * `localNodeId`: _String (base64)_ or _Buffer_ An optional String or a Buffer representing the local node id. If not provided, a local node id will be created via `crypto.createHash('sha1').digest()`. If a String is provided, it will be assumed to be base64 encoded and will be converted into a Buffer.
+    * `localNodeId`: _String (base64)_ or _Buffer_ An optional String or a Buffer representing the local node id. If not provided, a local node id will be created via `crypto.createHash('sha1').update('' + new Date().getTime() + process.hrtime()[1]).digest()`. If a String is provided, it will be assumed to be base64 encoded and will be converted into a Buffer.
     * `root`: _Object_ _**CAUTION: reserved for internal use**_ Provides a reference to the root of the tree data structure as the k-bucket splits when new contacts are added.
 
 Creates a new KBucket.
