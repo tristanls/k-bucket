@@ -1,26 +1,26 @@
 {
-    "name": "k-bucket",
-    "version": "0.2.0",
-    "description": "Kademlia DHT K-bucket implementation as a binary tree",
-    "scripts": {
-        "test": "node scripts/test.js"
-    },
-    "main": "index.js",
-    "dependencies": {
-        "buffertools": "1.1.1"
-    },
-    "devDependencies": {
-        "nodeunit": "0.8.1"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git@github.com:tristanls/node-k-bucket.git"
-    },
-    "keywords": [
-        "k-bucket",
-        "kademlia",
-        "dht"
-    ],
-    "author": "Tristan Slominski <tristan.slominski@gmail.com>",
-    "license": "MIT"
+  "name": "k-bucket",
+  "version": "0.2.1",
+  "description": "Kademlia DHT K-bucket implementation as a binary tree",
+  "scripts": {
+    "test": "node scripts/test.js"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "buffertools": "1.1.1"
+  },
+  "devDependencies": {
+    "nodeunit": "0.8.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:tristanls/node-k-bucket.git"
+  },
+  "keywords": [
+    "k-bucket",
+    "kademlia",
+    "dht"
+  ],
+  "author": "Tristan Slominski <tristan.slominski@gmail.com>",
+  "license": "MIT"
 }
