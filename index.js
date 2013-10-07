@@ -67,9 +67,7 @@ KBucket.distance = function distance (firstId, secondId) {
     var max = Math.max(firstId.length, secondId.length);
     var accumulator = '';
     for (var i = 0; i < max; i++) {
-        var maxDistance = false;
-        if (firstId[i] === undefined) maxDistance = true;
-        if (secondId[i] === undefined) maxDistance = true;
+        var maxDistance = (firstId[i] === undefined || secondId[i] === undefined);
         if (maxDistance) {
             accumulator += (255).toString(16);
         } else {
@@ -182,10 +180,11 @@ KBucket.prototype.determineBucket = function determineBucket (id, bitIndex) {
     // are extra bits to consider, this means id has less bits than what 
     // bitIndex describes, id therefore is too short, and will be put in low 
     // bucket
-    var bytesDescribedByBitIndex = parseInt(bitIndex / 8);
+    var bytesDescribedByBitIndex = parseInt(bitIndex / 8, 10);
     var bitIndexWithinByte = bitIndex % 8;
     if ((id.length <= bytesDescribedByBitIndex)
-        && (bitIndexWithinByte != 0)) return -1; 
+        && (bitIndexWithinByte != 0))
+        return -1; 
 
     var byteUnderConsideration = id[bytesDescribedByBitIndex];
 
@@ -292,7 +291,8 @@ KBucket.prototype.update = function update (contact, index) {
     // sanity check
     assert.ok(self.bucket[index].id.equals(contact.id), 
         "indexOf() calculation resulted in wrong index");
-    if (self.bucket[index].vectorClock > contact.vectorClock) return;
+    if (self.bucket[index].vectorClock > contact.vectorClock)
+        return;
     self.bucket.push(self.bucket.splice(index, 1)[0]);
     self.bucket[self.bucket.length - 1].vectorClock = contact.vectorClock;
 };
