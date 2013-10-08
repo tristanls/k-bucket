@@ -4,6 +4,10 @@ _Stability: 1 - [Experimental](https://github.com/tristanls/stability-index#stab
 
 Kademlia DHT K-bucket implementation as a binary tree.
 
+## Contributors
+
+[@tristanls](https://github.com/tristanls), [@mikedeboer](https://github.com/mikedeboer)
+
 ## Installation
 
     npm install k-bucket

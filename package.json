@@ -21,6 +21,9 @@
     "kademlia",
     "dht"
   ],
-  "author": "Tristan Slominski <tristan.slominski@gmail.com>",
+  "contributors": [
+    "Tristan Slominski <tristan.slominski@gmail.com>",
+    "Mike de Boer <info@mikedeboer.nl>"
+  ],
   "license": "MIT"
 }
