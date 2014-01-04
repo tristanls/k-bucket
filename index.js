@@ -287,6 +287,21 @@ KBucket.prototype.splitAndAdd = function splitAndAdd (contact, bitIndex) {
     return self;
 };
 
+// Returns all the contacts contained in the tree as an array.
+// If self is a leaf, return a copy of the bucket. `slice` is used so that we
+// don't accidentally leak an internal reference out that might be accidentally
+// misused. If self is not a leaf, return the union of the low and high
+// branches (themselves also as arrays).
+KBucket.prototype.toArray = function toArray () {
+    var self = this;
+    
+    if (self.bucket) {
+        return self.bucket.slice(0);
+    } else {
+        return self.low.toArray().concat(self.high.toArray());
+    }
+};
+
 // Updates the contact by comparing vector clocks.
 // If new contact vector clock is deprecated, contact is abandoned (not added).
 // If new contact vector clock is the same, contact is marked as most recently
@@ -305,17 +320,4 @@ KBucket.prototype.update = function update (contact, index) {
         return;
     self.bucket.push(self.bucket.splice(index, 1)[0]);
     self.bucket[self.bucket.length - 1].vectorClock = contact.vectorClock;
-};
-
-// Returns all the contacts contained in the tree as an array.
-// If this is a leaf, return a copy of the bucket. `slice` is used so that we
-// don't accidentally leak an internal reference out that might be accidentally
-// misused. If this is not a leaf, return the union of the low and high
-// branches (themselves also as arrays).
-KBucket.prototype.toArray = function toArray () {
-    if (this.bucket) {
-        return this.bucket.slice(0);
-    } else {
-        return this.low.toArray().concat(this.high.toArray());
-    }
 };

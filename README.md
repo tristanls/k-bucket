@@ -134,12 +134,6 @@ _NOTE: `kBucket.indexOf(contact)` does not compare `contact.vectorClock`_
 
 Removes the `contact`.
 
-#### kBucket.toArray()
-
-  * Return: _Array_ All of the contacts in the tree, as an array
-
-Traverses the tree, putting all the contacts into one array.
-
 #### kBucket.splitAndAdd(contact, [bitIndex])
 
 _**CAUTION: reserved for internal use**_
@@ -151,6 +145,12 @@ _**CAUTION: reserved for internal use**_
   * Return: _Object_ The k-bucket itself.
 
 Splits the bucket, redistributes contacts to the new buckets, and marks the bucket that was split as an inner node of the binary tree of buckets by setting `self.bucket = undefined`. Also, marks the "far away" bucket as `dontSplit`.
+
+#### kBucket.toArray()
+
+  * Return: _Array_ All of the contacts in the tree, as an array
+
+Traverses the tree, putting all the contacts into one array.
 
 #### kBucket.update(contact, index)
 
