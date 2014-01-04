@@ -296,3 +296,14 @@ KBucket.prototype.update = function update (contact, index) {
     self.bucket.push(self.bucket.splice(index, 1)[0]);
     self.bucket[self.bucket.length - 1].vectorClock = contact.vectorClock;
 };
+
+// Counts the number of contacts recursively.
+// If this is a leaf, just return the number of contacts contained. Otherwise,
+// return the length of the high and low branches combined.
+KBucket.prototype.count = function count () {
+    if (this.bucket) {
+        return this.bucket.length;
+    } else {
+        return this.high.count() + this.low.count();
+    }
+};
