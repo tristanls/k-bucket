@@ -159,6 +159,17 @@ KBucket.prototype.closest = function closest (contact, n, bitIndex) {
     return contacts.slice(0, n);
 };
 
+// Counts the number of contacts recursively.
+// If this is a leaf, just return the number of contacts contained. Otherwise,
+// return the length of the high and low branches combined.
+KBucket.prototype.count = function count () {
+    if (this.bucket) {
+        return this.bucket.length;
+    } else {
+        return this.high.count() + this.low.count();
+    }
+};
+
 // Determines whether the id at the bitIndex is 0 or 1. If 0, returns -1, else 1
 // id: a Buffer to compare localNodeId with
 // bitIndex: the bitIndex to which bit to check in the id Buffer
@@ -292,15 +303,4 @@ KBucket.prototype.update = function update (contact, index) {
         return;
     self.bucket.push(self.bucket.splice(index, 1)[0]);
     self.bucket[self.bucket.length - 1].vectorClock = contact.vectorClock;
-};
-
-// Counts the number of contacts recursively.
-// If this is a leaf, just return the number of contacts contained. Otherwise,
-// return the length of the high and low branches combined.
-KBucket.prototype.count = function count () {
-    if (this.bucket) {
-        return this.bucket.length;
-    } else {
-        return this.high.count() + this.low.count();
-    }
 };

@@ -53,8 +53,8 @@ As more contacts are added to the "far" k-bucket and it reaches its capacity, it
   * [new KBucket(options)](#new-kbucketoptions)
   * [kBucket.add(contact, \[bitIndex\])](#kbucketaddcontact-bitindex)
   * [kBucket.closest(contact, n, \[bitIndex\])](#kbucketclosestcontact-n-bitindex)
-  * [kBucket.remove(contact, \[bitIndex\])](#kbucketremovecontact-bitindex)
   * [kBucket.count()](#kbucketcount)
+  * [kBucket.remove(contact, \[bitIndex\])](#kbucketremovecontact-bitindex)
   * [Event 'ping'](#event-ping)
 
 #### KBucket.distance(firstId, secondId)
@@ -94,6 +94,12 @@ Adds a `contact` to the k-bucket.
 
 Get the `n` closest contacts to the provided `contact`. "Closest" here means: closest according to the XOR metric of the `contact` node id.
 
+#### kBucket.count()
+
+  * Return: _Number_ The number of contacts held in the tree
+
+Counts the total number of contacts in the tree.
+
 #### kBucket.determineBucket(id, [bitIndex])
 
 _**CAUTION: reserved for internal use**_
@@ -126,12 +132,6 @@ _NOTE: `kBucket.indexOf(contact)` does not compare `contact.vectorClock`_
   * Return: _Object_ The k-bucket itself.
 
 Removes the `contact`.
-
-#### kBucket.count()
-
-  * Return: _Number_ The number of contacts held in the tree
-
-Counts the total number of contacts in the tree.
 
 #### kBucket.splitAndAdd(contact, [bitIndex])
 
