@@ -163,10 +163,12 @@ KBucket.prototype.closest = function closest (contact, n, bitIndex) {
 // If this is a leaf, just return the number of contacts contained. Otherwise,
 // return the length of the high and low branches combined.
 KBucket.prototype.count = function count () {
-    if (this.bucket) {
-        return this.bucket.length;
+    var self = this;
+
+    if (self.bucket) {
+        return self.bucket.length;
     } else {
-        return this.high.count() + this.low.count();
+        return self.high.count() + self.low.count();
     }
 };
 
