@@ -54,6 +54,7 @@ As more contacts are added to the "far" k-bucket and it reaches its capacity, it
   * [kBucket.add(contact, \[bitIndex\])](#kbucketaddcontact-bitindex)
   * [kBucket.closest(contact, n, \[bitIndex\])](#kbucketclosestcontact-n-bitindex)
   * [kBucket.remove(contact, \[bitIndex\])](#kbucketremovecontact-bitindex)
+  * [kBucket.count()](#kbucketcount)
   * [Event 'ping'](#event-ping)
 
 #### KBucket.distance(firstId, secondId)
@@ -125,6 +126,12 @@ _NOTE: `kBucket.indexOf(contact)` does not compare `contact.vectorClock`_
   * Return: _Object_ The k-bucket itself.
 
 Removes the `contact`.
+
+#### kBucket.count()
+
+  * Return: _Number_ The number of contacts held in the tree
+
+Counts the total number of contacts in the tree.
 
 #### kBucket.splitAndAdd(contact, [bitIndex])
 
