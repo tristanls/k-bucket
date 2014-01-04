@@ -46,10 +46,7 @@ var KBucket = module.exports = function KBucket (options) {
     // the bucket array has least-recently-contacted at the "front/left" side
     // and the most-recently-contaced at the "back/right" side
     self.bucket = [];
-    self.localNodeId = options.localNodeId 
-        || crypto.createHash('sha1')
-            .update('' + new Date().getTime() + process.hrtime()[1])
-            .digest();
+    self.localNodeId = options.localNodeId || crypto.randomBytes(20);
     if (!(self.localNodeId instanceof Buffer)) {
         self.localNodeId = new Buffer(self.localNodeId, 'base64');
     }
