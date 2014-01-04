@@ -304,3 +304,20 @@ KBucket.prototype.update = function update (contact, index) {
     self.bucket.push(self.bucket.splice(index, 1)[0]);
     self.bucket[self.bucket.length - 1].vectorClock = contact.vectorClock;
 };
+
+// Get a contact by its exact ID.
+// If this is a leaf, loop through the bucket contents and return the correct
+// contact if we have it. Otherwise check the low and high branches in that
+// order, finally returning null if neither of them have the contact either.
+// id: *required* a Buffer specifying the ID of the contact to fetch
+KBucket.prototype.get = function get (id) {
+    if (this.bucket) {
+        for (var i=0;i<this.bucket.length;++i) {
+            if (bufferEqual(this.bucket[i].id, id)) {
+                return this.bucket[i];
+            }
+        }
+    } else {
+        return this.low.get(id) || this.high.get(id) || null;
+    }
+};
