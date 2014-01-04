@@ -7,7 +7,7 @@
   },
   "main": "index.js",
   "dependencies": {
-    "buffertools": "1.1.1"
+    "buffer-equal": "0.0.0"
   },
   "devDependencies": {
     "nodeunit": "0.8.1"
