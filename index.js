@@ -31,7 +31,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 "use strict";
 
 var assert = require('assert'),
-    bufferEqual = require('buffer-equal'),
+    bufferEqual = require('./lib/bufferEqual.js'),
     constants = require('./lib/constants.js'),
     crypto = require('crypto'),
     events = require('events'),
