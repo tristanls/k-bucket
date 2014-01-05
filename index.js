@@ -326,14 +326,22 @@ KBucket.prototype.update = function update (contact, index) {
 // contact if we have it. Otherwise check the low and high branches in that
 // order, finally returning null if neither of them have the contact either.
 // id: *required* a Buffer specifying the ID of the contact to fetch
-KBucket.prototype.get = function get (id) {
-    if (this.bucket) {
-        for (var i=0;i<this.bucket.length;++i) {
-            if (bufferEqual(this.bucket[i].id, id)) {
-                return this.bucket[i];
-            }
+// bitIndex: the bitIndex to which bit to check in the Buffer for navigating 
+//           the binary tree
+KBucket.prototype.get = function get (id, bitIndex) {
+    if (!this.bucket) {
+        bitIndex = bitIndex || 0;
+
+        if (this.determineBucket(id, bitIndex++) < 0) {
+            return this.low.get(id, bitIndex);
+        } else {
+            return this.high.get(id, bitIndex);
         }
-    } else {
-        return this.low.get(id) || this.high.get(id) || null;
+    }
+
+    for (var i=0;i<this.bucket.length;++i) {
+        if (bufferEqual(this.bucket[i].id, id)) {
+            return this.bucket[i];
+        }
     }
 };
