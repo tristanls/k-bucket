@@ -231,14 +231,12 @@ KBucket.prototype.get = function get (id, bitIndex) {
         }
     }
 
-    for (var i=0; i < self.bucket.length; ++i) {
-        if (bufferEqual(self.bucket[i].id, id)) {
-            return self.bucket[i];
-        }
+    var index = self.indexOf({id: id}); // index of uses contact.id for matching
+    if (index < 0) {
+        return null; // contact not found
     }
 
-    // we did not find the contact
-    return null;
+    return self.bucket[index];
 };
 
 // Returns the index of the contact if it exists
