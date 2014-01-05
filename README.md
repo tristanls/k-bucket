@@ -54,6 +54,7 @@ As more contacts are added to the "far" k-bucket and it reaches its capacity, it
   * [kBucket.add(contact, \[bitIndex\])](#kbucketaddcontact-bitindex)
   * [kBucket.closest(contact, n, \[bitIndex\])](#kbucketclosestcontact-n-bitindex)
   * [kBucket.count()](#kbucketcount)
+  * [kBucket.get(id, \[bitIndex\])](#kbucketgetid-bitindex)
   * [kBucket.remove(contact, \[bitIndex\])](#kbucketremovecontact-bitindex)
   * [kBucket.toArray()](#kbuckettoarray)
   * [Event 'ping'](#event-ping)
@@ -110,6 +111,14 @@ _**CAUTION: reserved for internal use**_
   * Return: _Integer_ -1 if `id` at `bitIndex` is 0, 1 otherwise.
 
 Determines whether the `id` at the `bitIndex` is 0 or 1. If 0, returns -1, else 1.
+
+#### kBucket.get(id, [bitIndex])
+
+  * `id`: _Buffer_ The ID of the `contact` to fetch
+  * `bitIndex`: _Integer_ _(Default: 0)_ _**CAUTION: reserved for internal use**_  The bit index to which bit to check in the `id` Buffer.
+  * Return: _Object_ The `contact` if available, otherwise null
+
+Retrieves the `contact`.
 
 #### kBucket.indexOf(contact)
 
