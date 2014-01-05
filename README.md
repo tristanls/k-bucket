@@ -127,9 +127,10 @@ _NOTE: `kBucket.indexOf(contact)` does not compare `contact.vectorClock`_
 
 Removes the `contact`.
 
-#### kBucket.get(id)
+#### kBucket.get(id, [bitIndex])
 
   * `id`: _Buffer_ The ID of the `contact` to fetch
+  * `bitIndex`: _Integer_ _(Default: 0)_ _**CAUTION: reserved for internal use**_  The bit index to which bit to check in the `id` Buffer.
   * Return: _Object_ The `contact` if available, otherwise null
 
 Retrieves the `contact`.
