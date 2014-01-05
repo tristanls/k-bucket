@@ -41,13 +41,15 @@ test['equal vectorClock results in contact marked as most recent'] = function (t
 
 test['more recent vectorClock results in contact update and contact being' +
      ' marked as most recent'] = function (test) {
-    test.expect(2);
+    test.expect(4);
     var kBucket = new KBucket();
-    var contact = {id: new Buffer("a"), vectorClock: 3};
+    var contact = {id: new Buffer("a"), old: 'property', vectorClock: 3};
     kBucket.add(contact);
     kBucket.add({id: new Buffer("b")});
-    kBucket.update({id: new Buffer("a"), vectorClock: 4}, 0);
+    kBucket.update({id: new Buffer("a"), newer: 'property', vectorClock: 4}, 0);
     test.ok(bufferEqual(kBucket.bucket[1].id, contact.id));
     test.equal(kBucket.bucket[1].vectorClock, 4);
+    test.strictEqual(kBucket.bucket[1].old, undefined);
+    test.strictEqual(kBucket.bucket[1].newer, 'property');
     test.done();
 };

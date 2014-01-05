@@ -317,6 +317,6 @@ KBucket.prototype.update = function update (contact, index) {
         "indexOf() calculation resulted in wrong index");
     if (self.bucket[index].vectorClock > contact.vectorClock)
         return;
-    self.bucket.push(self.bucket.splice(index, 1)[0]);
-    self.bucket[self.bucket.length - 1].vectorClock = contact.vectorClock;
+    self.bucket.splice(index, 1); // remove old contact
+    self.bucket.push(contact); // add more recent contact version
 };
