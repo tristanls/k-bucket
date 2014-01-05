@@ -211,6 +211,36 @@ KBucket.prototype.determineBucket = function determineBucket (id, bitIndex) {
     return -1;
 };
 
+// Get a contact by its exact ID.
+// If this is a leaf, loop through the bucket contents and return the correct
+// contact if we have it or null if not. If this is an inner node, determine
+// which branch of the tree to traverse and repeat.
+// id: *required* a Buffer specifying the ID of the contact to fetch
+// bitIndex: the bitIndex to which bit to check in the Buffer for navigating
+//           the binary tree
+KBucket.prototype.get = function get (id, bitIndex) {
+    var self = this;
+
+    if (!self.bucket) {
+        bitIndex = bitIndex || 0;
+
+        if (self.determineBucket(id, bitIndex++) < 0) {
+            return self.low.get(id, bitIndex);
+        } else {
+            return self.high.get(id, bitIndex);
+        }
+    }
+
+    for (var i=0; i < self.bucket.length; ++i) {
+        if (bufferEqual(self.bucket[i].id, id)) {
+            return self.bucket[i];
+        }
+    }
+
+    // we did not find the contact
+    return null;
+};
+
 // Returns the index of the contact if it exists
 // **NOTE**: indexOf() does not compare vectorClock
 KBucket.prototype.indexOf = function indexOf (contact) {
@@ -319,29 +349,4 @@ KBucket.prototype.update = function update (contact, index) {
         return;
     self.bucket.splice(index, 1); // remove old contact
     self.bucket.push(contact); // add more recent contact version
-};
-
-// Get a contact by its exact ID.
-// If this is a leaf, loop through the bucket contents and return the correct
-// contact if we have it. Otherwise check the low and high branches in that
-// order, finally returning null if neither of them have the contact either.
-// id: *required* a Buffer specifying the ID of the contact to fetch
-// bitIndex: the bitIndex to which bit to check in the Buffer for navigating 
-//           the binary tree
-KBucket.prototype.get = function get (id, bitIndex) {
-    if (!this.bucket) {
-        bitIndex = bitIndex || 0;
-
-        if (this.determineBucket(id, bitIndex++) < 0) {
-            return this.low.get(id, bitIndex);
-        } else {
-            return this.high.get(id, bitIndex);
-        }
-    }
-
-    for (var i=0;i<this.bucket.length;++i) {
-        if (bufferEqual(this.bucket[i].id, id)) {
-            return this.bucket[i];
-        }
-    }
 };

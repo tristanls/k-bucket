@@ -112,6 +112,14 @@ _**CAUTION: reserved for internal use**_
 
 Determines whether the `id` at the `bitIndex` is 0 or 1. If 0, returns -1, else 1.
 
+#### kBucket.get(id, [bitIndex])
+
+  * `id`: _Buffer_ The ID of the `contact` to fetch
+  * `bitIndex`: _Integer_ _(Default: 0)_ _**CAUTION: reserved for internal use**_  The bit index to which bit to check in the `id` Buffer.
+  * Return: _Object_ The `contact` if available, otherwise null
+
+Retrieves the `contact`.
+
 #### kBucket.indexOf(contact)
 
 _**CAUTION: reserved for internal use**_
@@ -134,14 +142,6 @@ _NOTE: `kBucket.indexOf(contact)` does not compare `contact.vectorClock`_
   * Return: _Object_ The k-bucket itself.
 
 Removes the `contact`.
-
-#### kBucket.get(id, [bitIndex])
-
-  * `id`: _Buffer_ The ID of the `contact` to fetch
-  * `bitIndex`: _Integer_ _(Default: 0)_ _**CAUTION: reserved for internal use**_  The bit index to which bit to check in the `id` Buffer.
-  * Return: _Object_ The `contact` if available, otherwise null
-
-Retrieves the `contact`.
 
 #### kBucket.splitAndAdd(contact, [bitIndex])
 
