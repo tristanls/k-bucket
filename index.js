@@ -30,9 +30,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 "use strict";
 
-require('buffertools');
-
 var assert = require('assert'),
+    bufferEqual = require('./lib/bufferEqual.js'),
     constants = require('./lib/constants.js'),
     crypto = require('crypto'),
     events = require('events'),
@@ -217,7 +216,7 @@ KBucket.prototype.determineBucket = function determineBucket (id, bitIndex) {
 KBucket.prototype.indexOf = function indexOf (contact) {
     var self = this;
     for (var i = 0; i < self.bucket.length; i++) {
-        if (self.bucket[i].id.equals(contact.id)) return i;
+        if (bufferEqual(self.bucket[i].id, contact.id)) return i;
     }
     return -1;
 };
@@ -314,7 +313,7 @@ KBucket.prototype.toArray = function toArray () {
 KBucket.prototype.update = function update (contact, index) {
     var self = this;
     // sanity check
-    assert.ok(self.bucket[index].id.equals(contact.id), 
+    assert.ok(bufferEqual(self.bucket[index].id, contact.id), 
         "indexOf() calculation resulted in wrong index");
     if (self.bucket[index].vectorClock > contact.vectorClock)
         return;

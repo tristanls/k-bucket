@@ -1,6 +1,7 @@
 "use strict";
 
-var KBucket = require('../index.js');
+var KBucket = require('../index.js'),
+    bufferEqual = require('../lib/bufferEqual.js');
 
 var test = module.exports = {};
 
@@ -46,7 +47,7 @@ test['more recent vectorClock results in contact update and contact being' +
     kBucket.add(contact);
     kBucket.add({id: new Buffer("b")});
     kBucket.update({id: new Buffer("a"), vectorClock: 4}, 0);
-    test.ok(kBucket.bucket[1].id.equals(contact.id));
+    test.ok(bufferEqual(kBucket.bucket[1].id, contact.id));
     test.equal(kBucket.bucket[1].vectorClock, 4);
     test.done();
 };

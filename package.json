@@ -6,11 +6,8 @@
     "test": "node scripts/test.js"
   },
   "main": "index.js",
-  "dependencies": {
-    "buffertools": "1.1.1"
-  },
   "devDependencies": {
-    "nodeunit": "0.8.1"
+    "nodeunit": "0.8.x"
   },
   "repository": {
     "type": "git",
