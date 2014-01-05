@@ -54,7 +54,7 @@ As more contacts are added to the "far" k-bucket and it reaches its capacity, it
   * [kBucket.add(contact, \[bitIndex\])](#kbucketaddcontact-bitindex)
   * [kBucket.closest(contact, n, \[bitIndex\])](#kbucketclosestcontact-n-bitindex)
   * [kBucket.remove(contact, \[bitIndex\])](#kbucketremovecontact-bitindex)
-  * [kBucket.get(id, \[bitIndex\])](#kbucketget-bitindex)
+  * [kBucket.get(id, \[bitIndex\])](#kbucketgetid-bitindex)
   * [Event 'ping'](#event-ping)
 
 #### KBucket.distance(firstId, secondId)
