@@ -4,7 +4,7 @@ index.js - Kademlia DHT K-bucket implementation as a binary tree.
 
 The MIT License (MIT)
 
-Copyright (c) 2013 Tristan Slominski
+Copyright (c) 2013-2014 Tristan Slominski
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
@@ -41,6 +41,14 @@ var KBucket = module.exports = function KBucket (options) {
     var self = this;
     options = options || {};
     events.EventEmitter.call(self);
+
+    // use an arbiter from options or vectorClock arbiter by default
+    self.arbiter = options.arbiter || function arbiter(incumbent, candidate) {
+        if (incumbent.vectorClock > candidate.vectorClock) {
+            return incumbent;
+        }
+        return candidate;
+    };
 
     // the bucket array has least-recently-contacted at the "front/left" side
     // and the most-recently-contaced at the "back/right" side
@@ -329,12 +337,14 @@ KBucket.prototype.toArray = function toArray () {
     }
 };
 
-// Updates the contact by comparing vector clocks.
-// If new contact vector clock is deprecated, contact is abandoned (not added).
-// If new contact vector clock is the same, contact is marked as most recently
+// Updates the contact selected by the arbiter.
+// If the selection is our old contact and the candidate is some new contact
+// then the new contact is abandoned (not added).
+// If the selection is our old contact and the candidate is our old contact
+// then we are refreshing the contact and it is marked as most recently
 // contacted (by being moved to the right/end of the bucket array).
-// If new contact vector clock is more recent, the old contact is removed and
-// the new contact is marked as most recently contacted.
+// If the selection is our new contact, the old contact is removed and the new
+// contact is marked as most recently contacted.
 // contact: *required* the contact to update
 // index: *required* the index in the bucket where contact exists
 //        (index has already been computed in a previous calculation)
@@ -343,8 +353,15 @@ KBucket.prototype.update = function update (contact, index) {
     // sanity check
     assert.ok(bufferEqual(self.bucket[index].id, contact.id), 
         "indexOf() calculation resulted in wrong index");
-    if (self.bucket[index].vectorClock > contact.vectorClock)
+
+    var incumbent = self.bucket[index];
+    var selection = self.arbiter(incumbent, contact);
+    if (selection === incumbent && incumbent !== contact) {
+        // if the selection is our old contact and the candidate is some new
+        // contact, then there is nothing to do
         return;
+    }
+
     self.bucket.splice(index, 1); // remove old contact
-    self.bucket.push(contact); // add more recent contact version
+    self.bucket.push(selection); // add more recent contact version
 };

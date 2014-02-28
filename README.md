@@ -2,6 +2,8 @@
 
 _Stability: 1 - [Experimental](https://github.com/tristanls/stability-index#stability-1---experimental)_
 
+[![NPM version](https://badge.fury.io/js/k-bucket.png)](http://npmjs.org/package/k-bucket)
+
 Kademlia DHT K-bucket implementation as a binary tree.
 
 ## Contributors
@@ -32,9 +34,58 @@ A [*Distributed Hash Table (DHT)*](http://en.wikipedia.org/wiki/Distributed_hash
 
 *k-bucket* is an implementation of a storage mechanism for keys within a DHT. It stores `contact` objects which represent locations and addresses of nodes in the decentralized distributed system. `contact` objects are typically identified by a SHA-1 hash, however this restriction is lifted in this implementation. Additionally, node ids of different lengths can be compared.
 
-This Kademlia DHT k-bucket implementation is meant to be as minimal as possible. It assumes that `contact` objects consist only of `id`, and an optional `vectorClock`. It is useful, and necessary, to attach other properties to a `contact`. For example, one may want to attach `ip` and `port` properties which allow the application to send IP traffic to the `contact`. However, this information is extraneous and irrelevant to the operation of a k-bucket.
+This Kademlia DHT k-bucket implementation is meant to be as minimal as possible. It assumes that `contact` objects consist only of `id`. It is useful, and necessary, to attach other properties to a `contact`. For example, one may want to attach `ip` and `port` properties, which allow an application to send IP traffic to the `contact`. However, this information is extraneous and irrelevant to the operation of a k-bucket.
 
-It is worth highlighting the presence of an optional `vectorClock` as part of `contact` implementation. The purpose of the `vectorClock` (a simple integer) is to enable distinguishing between `contact` objects that may have "physically" moved to a different machine while keeping the same `contact.id`. This is useful when working with actors and an actor moves from one machine to another.
+### arbiter function
+
+This *k-bucket* implementation implements a conflict resolution mechanism using an `arbiter` function. The purpose of the `arbiter` is to choose between two `contact` objects with the same `id` but perhaps different properties and determine which one should be stored.  As the `arbiter` function returns the actual object to be stored, it does not need to make an either/or choice, but instead could perform some sort of operation and return the result as a new object that would then be stored. See [kBucket.update(contact, index)](#kbucketupdatecontact-index) for detailed semantics of which `contact` (`incumbent` or `candidate`) is selected.
+
+For example, an `arbiter` function implementing a `vectorClock` mechanism would look something like:
+
+```javascript
+// contact example
+var contact = {
+    id: new Buffer('contactId'),
+    vectorClock: 0
+};
+
+function arbiter(incumbent, candidate) {
+    if (incumbent.vectorClock > candidate.vectorClock) {
+        return incumbent;
+    }
+    return candidate;
+};
+```
+
+Alternatively, consider an arbiter that implements a Grow-Only-Set CRDT mechanism:
+
+```javascript
+// contact example
+var contact = {
+    id: new Buffer('workerService'),
+    workerNodes: {
+        '17asdaf7effa2': { host: '127.0.0.1', port: 1337 },
+        '17djsyqeryasu': { host: '127.0.0.1', port: 1338 }
+    }
+};
+
+function arbiter(incumbent, candidate) {
+    // we create a new object so that our selection is guaranteed to replace
+    // the incumbent
+    var merged = {
+        id: incumbent.id, // incumbent.id === candidate.id within an arbiter
+        workerNodes: incumbent.workerNodes
+    };
+
+    Object.keys(candidate.workerNodes).forEach(function (workerNodeId) {
+        merged.workerNodes[workerNodeId] = candidate.workerNodes[workerNodeId];
+    });
+
+    return merged;
+}
+```
+
+Notice that in the above case, the Grow-Only-Set assumes that each worker node has a globally unique id.
 
 ## Documentation
 
@@ -70,6 +121,7 @@ Finds the XOR distance between firstId and secondId.
 #### new KBucket(options)
 
   * `options`:
+    * `arbiter`: _Function_ _(Default: vectorClock arbiter)_ `function (incumbent, candidate) { return contact; }` An optional `arbiter` function that givent two `contact` objects with the same `id` returns the desired object to be used for updating the k-bucket. For more details, see [arbiter function](#arbiter-function).
     * `localNodeId`: _String (base64)_ or _Buffer_ An optional String or a Buffer representing the local node id. If not provided, a local node id will be created via `crypto.randomBytes(20)`. If a String is provided, it will be assumed to be base64 encoded and will be converted into a Buffer.
     * `root`: _Object_ _**CAUTION: reserved for internal use**_ Provides a reference to the root of the tree data structure as the k-bucket splits when new contacts are added.
 
@@ -131,7 +183,7 @@ _**CAUTION: reserved for internal use**_
 
 Returns the index of the `contact` if it exists, returns -1 otherwise.
 
-_NOTE: `kBucket.indexOf(contact)` does not compare `contact.vectorClock`_
+_NOTE: `kBucket.indexOf(contact)` does not use `arbiter` in the comparison.
 
 #### kBucket.remove(contact, [bitIndex])
 
@@ -170,7 +222,7 @@ _**CAUTION: reserved for internal use**_
     * Any satellite data that is part of the `contact` object will not be altered, only `id` is used.
   * `index`: _Integer_ The index in the bucket where contact exists (index has already been computed in previous calculation).
 
-Updates the `contact` and compares the vector clocks if provided. If new `contact` vector clock is deprecated, `contact` is abandoned (not added). If new `contact` vector clock is the same, `contact` is marked as moste recently contacted (by being moved to the right/end of the bucket array). If new `contact` vector clock is more recent, the old `contact` is removed and the new contact is marked as most recently contacted.
+Updates the `contact` by using the `arbiter` function to compare the incumbent and the candidate. If `arbiter` function selects the old `contact` but the candidate is some new `contact`, then the new `contact` is abandoned. If `arbiter` function selects the old `contact` and the candidate is that same old `contact`, the `contact` is marked as most recently contacted (by being moved to the right/end of the bucket array). If `arbiter` function selects the new `contact`, the old `contact` is removed and the new `contact` is marked as most recently contacted.
 
 #### Event: 'ping'
 
