@@ -31,7 +31,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 "use strict";
 
 var assert = require('assert'),
-    bufferEqual = require('./lib/bufferEqual.js'),
+    bufferEqual = require('buffer-equal'),
     constants = require('./lib/constants.js'),
     crypto = require('crypto'),
     events = require('events'),
@@ -82,7 +82,7 @@ KBucket.distance = function distance (firstId, secondId) {
 };
 
 // contact: *required* the contact object to add
-// bitIndex: the bitIndex to which bit to check in the Buffer for navigating 
+// bitIndex: the bitIndex to which bit to check in the Buffer for navigating
 //           the binary tree
 KBucket.prototype.add = function add (contact, bitIndex) {
     var self = this;
@@ -120,19 +120,19 @@ KBucket.prototype.add = function add (contact, bitIndex) {
         // in order to determine if they are alive
         // only if one of the pinged nodes does not respond, can the new contact
         // be added (this prevents DoS flodding with new invalid contacts)
-        self.root.emit('ping', 
+        self.root.emit('ping',
             self.bucket.slice(0, constants.DEFAULT_NUMBER_OF_NODES_TO_PING),
             contact);
         return self;
     }
-    
+
     return self.splitAndAdd(contact, bitIndex);
 };
 
 // contact: Object *required* contact object
 //   id: Buffer *require* node id
 // n: Integer *required* maximum number of closest contacts to return
-// bitIndex: Integer (Default: 0) 
+// bitIndex: Integer (Default: 0)
 // Return: Array of maximum of `n` closest contacts to the `contact`
 KBucket.prototype.closest = function closest (contact, n, bitIndex) {
     var self = this;
@@ -141,7 +141,7 @@ KBucket.prototype.closest = function closest (contact, n, bitIndex) {
 
     if (!self.bucket) {
         bitIndex = bitIndex || 0;
-        
+
         if (self.determineBucket(contact.id, bitIndex++) < 0) {
             contacts = self.low.closest(contact, n, bitIndex);
             if (contacts.length < n) {
@@ -187,28 +187,28 @@ KBucket.prototype.determineBucket = function determineBucket (id, bitIndex) {
 
     bitIndex = bitIndex || 0;
 
-    // **NOTE** remember that id is a Buffer and has granularity of 
+    // **NOTE** remember that id is a Buffer and has granularity of
     // bytes (8 bits), whereas the bitIndex is the _bit_ index (not byte)
 
     // id's that are too short are put in low bucket (1 byte = 8 bits)
     // parseInt(bitIndex / 8) finds how many bytes the bitIndex describes
     // bitIndex % 8 checks if we have extra bits beyond byte multiples
     // if number of bytes is <= no. of bytes described by bitIndex and there
-    // are extra bits to consider, this means id has less bits than what 
-    // bitIndex describes, id therefore is too short, and will be put in low 
+    // are extra bits to consider, this means id has less bits than what
+    // bitIndex describes, id therefore is too short, and will be put in low
     // bucket
     var bytesDescribedByBitIndex = parseInt(bitIndex / 8, 10);
     var bitIndexWithinByte = bitIndex % 8;
     if ((id.length <= bytesDescribedByBitIndex)
         && (bitIndexWithinByte != 0))
-        return -1; 
+        return -1;
 
     var byteUnderConsideration = id[bytesDescribedByBitIndex];
 
-    // byteUnderConsideration is an integer from 0 to 255 represented by 8 bits 
+    // byteUnderConsideration is an integer from 0 to 255 represented by 8 bits
     // where 255 is 11111111 and 0 is 00000000
-    // in order to find out whether the bit at bitIndexWithinByte is set 
-    // we construct Math.pow(2, (7 - bitIndexWithinByte)) which will consist 
+    // in order to find out whether the bit at bitIndexWithinByte is set
+    // we construct Math.pow(2, (7 - bitIndexWithinByte)) which will consist
     // of all bits being 0, with only one bit set to 1
     // for example, if bitIndexWithinByte is 3, we will construct 00010000 by
     // Math.pow(2, (7 - 3)) -> Math.pow(2, 4) -> 16
@@ -258,7 +258,7 @@ KBucket.prototype.indexOf = function indexOf (contact) {
 };
 
 // contact: *required* the contact object to remove
-// bitIndex: the bitIndex to which bit to check in the Buffer for navigating 
+// bitIndex: the bitIndex to which bit to check in the Buffer for navigating
 //           the binary tree
 KBucket.prototype.remove = function remove (contact, bitIndex) {
     var self = this;
@@ -315,7 +315,7 @@ KBucket.prototype.splitAndAdd = function splitAndAdd (contact, bitIndex) {
     } else {
         self.low.dontSplit = true;
     }
-    
+
     // add the contact being added
     self.add(contact, bitIndex);
 
@@ -329,7 +329,7 @@ KBucket.prototype.splitAndAdd = function splitAndAdd (contact, bitIndex) {
 // branches (themselves also as arrays).
 KBucket.prototype.toArray = function toArray () {
     var self = this;
-    
+
     if (self.bucket) {
         return self.bucket.slice(0);
     } else {
@@ -351,7 +351,7 @@ KBucket.prototype.toArray = function toArray () {
 KBucket.prototype.update = function update (contact, index) {
     var self = this;
     // sanity check
-    assert.ok(bufferEqual(self.bucket[index].id, contact.id), 
+    assert.ok(bufferEqual(self.bucket[index].id, contact.id),
         "indexOf() calculation resulted in wrong index");
 
     var incumbent = self.bucket[index];

@@ -84,7 +84,7 @@ test['when splitting buckets the "far away" bucket should be marked' +
         }
         kBucket.add({id: new Buffer(iString, 'hex')});
     }
-    // above algorithm will split low bucket 4 times and put 0x00 through 0x0f 
+    // above algorithm will split low bucket 4 times and put 0x00 through 0x0f
     // in the low bucket, and put 0x10 through 0x14 in high bucket
     // since localNodeId is 0x00, we expect every high bucket to be "far" and
     // therefore marked as "dontSplit = true"

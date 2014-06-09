@@ -7,7 +7,10 @@
   },
   "main": "index.js",
   "devDependencies": {
-    "nodeunit": "0.8.x"
+    "nodeunit": "0.9.x"
+  },
+  "dependencies": {
+    "buffer-equal": "0.0.1"
   },
   "repository": {
     "type": "git",

@@ -1,6 +1,6 @@
 "use strict";
 
-var bufferEqual = require('../lib/bufferEqual.js'),
+var bufferEqual = require('buffer-equal'),
     constants = require('../lib/constants.js'),
     KBucket = require('../index.js');
 
@@ -32,7 +32,7 @@ test['get retrieves most recently added contact if same id'] = function (test) {
     test.ok(bufferEqual(kBucket.get(new Buffer("a")).id, new Buffer("a")));
     test.equal(kBucket.get(new Buffer("a")).foo, 'bar');
     test.strictEqual(kBucket.get(new Buffer("a")).bar, undefined);
-    test.done();    
+    test.done();
 };
 
 test['get retrieves contact from nested leaf node'] = function (test) {
@@ -46,7 +46,7 @@ test['get retrieves contact from nested leaf node'] = function (test) {
         }
         iString = '80' + iString; // make sure all go into "far away" bucket
         kBucket.add({id: new Buffer(iString, 'hex')});
-    } 
+    }
     // cause a split to happen
     kBucket.add({id: new Buffer('00' + iString, 'hex'), find: 'me'});
     test.equal(kBucket.get(new Buffer('00' + iString, 'hex')).find, 'me');

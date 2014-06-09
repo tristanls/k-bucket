@@ -25,9 +25,9 @@ test['toArray should return all contacts in an array arranged from low to high b
         iString = '80' + iString; // make sure all go into "far away" bucket
         expectedIds.push(iString);
         kBucket.add({id: new Buffer(iString, 'hex')});
-    } 
+    }
     // cause a split to happen
-    kBucket.add({id: new Buffer('00' + iString, 'hex')});   
+    kBucket.add({id: new Buffer('00' + iString, 'hex')});
     // console.log(require('util').inspect(kBucket, {depth: null}));
     var contacts = kBucket.toArray();
     // console.log(require('util').inspect(contacts, {depth: null}));

@@ -1,7 +1,7 @@
 "use strict";
 
 var KBucket = require('../index.js'),
-    bufferEqual = require('../lib/bufferEqual.js');
+    bufferEqual = require('buffer-equal');
 
 var test = module.exports = {};
 
