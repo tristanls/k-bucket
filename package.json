@@ -24,7 +24,8 @@
   "contributors": [
     "Tristan Slominski <tristan.slominski@gmail.com>",
     "Mike de Boer <info@mikedeboer.nl>",
-    "Conrad Pankoff <deoxxa@fknsrs.biz>"
+    "Conrad Pankoff <deoxxa@fknsrs.biz>",
+    "Feross Aboukhadijeh <feross@feross.org>"
   ],
   "license": "MIT"
 }
