@@ -1,7 +1,6 @@
 "use strict";
 
-var constants = require('../lib/constants.js'),
-    KBucket = require('../index.js');
+var KBucket = require('../index.js');
 
 var test = module.exports = {};
 
@@ -44,19 +43,19 @@ test['adding same contact moves it to the end of the bucket ' +
 test['adding contact to bucket that can\'t be split results in emitting' +
      ' "ping" event'] = function (test) {
     var i, iString, j;
-    test.expect(constants.DEFAULT_NUMBER_OF_NODES_TO_PING + 2);
+    test.expect(3 /*numberOfNodesToPing*/ + 2);
     var kBucket = new KBucket({localNodeId: new Buffer('0000', 'hex')});
     kBucket.on('ping', function (contacts, replacement) {
-        test.equal(contacts.length, constants.DEFAULT_NUMBER_OF_NODES_TO_PING);
+        test.equal(contacts.length, kBucket.numberOfNodesToPing);
         // console.dir(kBucket.high.bucket[0]);
-        for (var i = 0; i < constants.DEFAULT_NUMBER_OF_NODES_TO_PING; i++) {
+        for (var i = 0; i < kBucket.numberOfNodesToPing; i++) {
             // the least recently contacted end of the bucket should be pinged
             test.equal(contacts[i], kBucket.high.bucket[i]);
         }
         test.deepEqual(replacement, {id: new Buffer(iString, 'hex')})
         test.done();
     });
-    for (var j = 0; j < constants.DEFAULT_NUMBER_OF_NODES_PER_K_BUCKET + 1; j++) {
+    for (var j = 0; j < kBucket.numberOfNodesPerKBucket + 1; j++) {
         iString = j.toString('16');
         if (iString.length < 2) {
             iString = '0' + iString;

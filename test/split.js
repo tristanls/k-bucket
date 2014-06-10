@@ -1,7 +1,6 @@
 "use strict";
 
-var constants = require('../lib/constants.js'),
-    KBucket = require('../index.js');
+var KBucket = require('../index.js');
 
 var test = module.exports = {};
 
@@ -15,12 +14,11 @@ test['adding a contact does not split K-bucket'] = function (test) {
     test.done();
 };
 
-test['adding maximum number of contacts (per K-bucket) [' +
-     constants.DEFAULT_NUMBER_OF_NODES_PER_K_BUCKET + ']' +
+test['adding maximum number of contacts (per K-bucket) [20]' +
      ' into K-bucket does not split K-bucket'] = function (test) {
     test.expect(3);
     var kBucket = new KBucket();
-    for (var i = 0; i < constants.DEFAULT_NUMBER_OF_NODES_PER_K_BUCKET; i++) {
+    for (var i = 0; i < kBucket.numberOfNodesPerKBucket; i++) {
         kBucket.add({id: new Buffer("" + i)});
     }
     test.ok(!kBucket.low);
@@ -29,12 +27,11 @@ test['adding maximum number of contacts (per K-bucket) [' +
     test.done();
 };
 
-test['adding maximum number of contacts (per K-bucket) + 1 [' +
-     (constants.DEFAULT_NUMBER_OF_NODES_PER_K_BUCKET + 1) + ']' +
+test['adding maximum number of contacts (per K-bucket) + 1 [21]' +
      ' into K-bucket splits the K-bucket'] = function (test) {
     test.expect(3);
     var kBucket = new KBucket();
-    for (var i = 0; i < constants.DEFAULT_NUMBER_OF_NODES_PER_K_BUCKET + 1; i++) {
+    for (var i = 0; i < kBucket.numberOfNodesPerKBucket + 1; i++) {
         kBucket.add({id: new Buffer("" + i)});
     }
     test.ok(kBucket.low instanceof KBucket);
@@ -44,10 +41,10 @@ test['adding maximum number of contacts (per K-bucket) + 1 [' +
 };
 
 test['split buckets contain all added contacts'] = function (test) {
-    test.expect(constants.DEFAULT_NUMBER_OF_NODES_PER_K_BUCKET + 2);
+    test.expect(20 /*numberOfNodesPerKBucket*/ + 2);
     var kBucket = new KBucket({localNodeId: new Buffer('00', 'hex')});
     var foundContact = {};
-    for (var i = 0; i < constants.DEFAULT_NUMBER_OF_NODES_PER_K_BUCKET + 1; i++) {
+    for (var i = 0; i < kBucket.numberOfNodesPerKBucket + 1; i++) {
         var iString = i.toString('16');
         if (iString.length < 2) {
             iString = '0' + iString;
@@ -77,7 +74,7 @@ test['when splitting buckets the "far away" bucket should be marked' +
      ' to prevent splitting "far away" bucket'] = function (test) {
     test.expect(5);
     var kBucket = new KBucket({localNodeId: new Buffer('00', 'hex')});
-    for (var i = 0; i < constants.DEFAULT_NUMBER_OF_NODES_PER_K_BUCKET + 1; i++) {
+    for (var i = 0; i < kBucket.numberOfNodesPerKBucket + 1; i++) {
         var iString = i.toString('16');
         if (iString.length < 2) {
             iString = '0' + iString;

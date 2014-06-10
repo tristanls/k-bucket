@@ -30,13 +30,34 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 "use strict";
 
-var assert = require('assert'),
-    bufferEqual = require('buffer-equal'),
-    constants = require('./lib/constants.js'),
-    crypto = require('crypto'),
-    events = require('events'),
-    util = require('util');
+var assert = require('assert');
+var bufferEqual = require('buffer-equal');
+var crypto = require('crypto');
+var events = require('events');
+var util = require('util');
 
+/*
+  * `options`:
+    * `arbiter`: _Function_ _(Default: vectorClock arbiter)_
+        `function (incumbent, candidate) { return contact; }` An optional
+        `arbiter` function that givent two `contact` objects with the same `id`
+        returns the desired object to be used for updating the k-bucket. For
+        more details, see [arbiter function](#arbiter-function).
+    * `localNodeId`: _String (base64)_ or _Buffer_ An optional String or a
+        Buffer representing the local node id. If not provided, a local node id
+        will be created via `crypto.randomBytes(20)`. If a String is provided,
+        it will be assumed to be base64 encoded and will be converted into a
+        Buffer.
+    * `numberOfNodesPerKBucket`: _Integer_ _(Default: 20)_ The number of nodes
+        that a k-bucket can contain before being full or split.
+    * `numberOfNodesToPing`: _Integer_ _(Default: 3)_ The number of nodes to
+        ping when a bucket that should not be split becomes full. KBucket will
+        emit a `ping` event that contains `numberOfNodesToPing` nodes that have
+        not been contacted the longest.
+    * `root`: _Object_ _**CAUTION: reserved for internal use**_ Provides a
+        reference to the root of the tree data structure as the k-bucket splits
+        when new contacts are added.
+*/
 var KBucket = module.exports = function KBucket (options) {
     var self = this;
     options = options || {};
@@ -57,6 +78,8 @@ var KBucket = module.exports = function KBucket (options) {
     if (!(self.localNodeId instanceof Buffer)) {
         self.localNodeId = new Buffer(self.localNodeId, 'base64');
     }
+    self.numberOfNodesPerKBucket = options.numberOfNodesPerKBucket || 20;
+    self.numberOfNodesToPing = options.numberOfNodesToPing || 3;
     self.root = options.root || self;
 
     // V8 hints
@@ -108,7 +131,7 @@ KBucket.prototype.add = function add (contact, bitIndex) {
         return self;
     }
 
-    if (self.bucket.length < constants.DEFAULT_NUMBER_OF_NODES_PER_K_BUCKET) {
+    if (self.bucket.length < self.numberOfNodesPerKBucket) {
         self.bucket.push(contact);
         return self;
     }
@@ -116,12 +139,12 @@ KBucket.prototype.add = function add (contact, bitIndex) {
     // the bucket is full
     if (self.dontSplit) {
         // we are not allowed to split the bucket
-        // we need to ping the first constants.DEFAULT_NUMBER_OF_NODES_TO_PING
+        // we need to ping the first self.numberOfNodesToPing
         // in order to determine if they are alive
         // only if one of the pinged nodes does not respond, can the new contact
         // be added (this prevents DoS flodding with new invalid contacts)
         self.root.emit('ping',
-            self.bucket.slice(0, constants.DEFAULT_NUMBER_OF_NODES_TO_PING),
+            self.bucket.slice(0, self.numberOfNodesToPing),
             contact);
         return self;
     }

@@ -1,7 +1,6 @@
 "use strict";
 
-var constants = require('../lib/constants.js'),
-    KBucket = require('../index.js');
+var KBucket = require('../index.js');
 
 var test = module.exports = {};
 

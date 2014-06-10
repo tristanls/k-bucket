@@ -1,8 +1,7 @@
 "use strict";
 
-var bufferEqual = require('buffer-equal'),
-    constants = require('../lib/constants.js'),
-    KBucket = require('../index.js');
+var bufferEqual = require('buffer-equal');
+var KBucket = require('../index.js');
 
 var test = module.exports = {};
 
@@ -39,7 +38,7 @@ test['get retrieves contact from nested leaf node'] = function (test) {
     test.expect(1);
     var iString;
     var kBucket = new KBucket({localNodeId: new Buffer('0000', 'hex')});
-    for (var i = 0; i < constants.DEFAULT_NUMBER_OF_NODES_PER_K_BUCKET; i++) {
+    for (var i = 0; i < kBucket.numberOfNodesPerKBucket; i++) {
         iString = i.toString('16');
         if (iString.length < 2) {
             iString = '0' + iString;

@@ -1,7 +1,6 @@
 "use strict";
 
-var constants = require('../lib/constants.js'),
-    KBucket = require('../index.js');
+var KBucket = require('../index.js');
 
 var test = module.exports = {};
 
@@ -17,7 +16,7 @@ test['toArray should return all contacts in an array arranged from low to high b
     var iString;
     var expectedIds = [];
     var kBucket = new KBucket({localNodeId: new Buffer('0000', 'hex')});
-    for (var i = 0; i < constants.DEFAULT_NUMBER_OF_NODES_PER_K_BUCKET; i++) {
+    for (var i = 0; i < kBucket.numberOfNodesPerKBucket; i++) {
         iString = i.toString('16');
         if (iString.length < 2) {
             iString = '0' + iString;
@@ -31,10 +30,10 @@ test['toArray should return all contacts in an array arranged from low to high b
     // console.log(require('util').inspect(kBucket, {depth: null}));
     var contacts = kBucket.toArray();
     // console.log(require('util').inspect(contacts, {depth: null}));
-    test.equal(contacts.length, constants.DEFAULT_NUMBER_OF_NODES_PER_K_BUCKET + 1);
+    test.equal(contacts.length, kBucket.numberOfNodesPerKBucket + 1);
     test.equal(contacts[0].id.toString('hex'), '00' + iString);
     contacts.shift(); // get rid of low bucket contact
-    for (i = 0; i < constants.DEFAULT_NUMBER_OF_NODES_PER_K_BUCKET; i++) {
+    for (i = 0; i < kBucket.numberOfNodesPerKBucket; i++) {
         test.equal(contacts[i].id.toString('hex'), expectedIds[i]);
     }
     test.done();

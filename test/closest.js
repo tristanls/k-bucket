@@ -1,7 +1,6 @@
 "use strict";
 
-var constants = require('../lib/constants.js'),
-    KBucket = require('../index.js');
+var KBucket = require('../index.js');
 
 var test = module.exports = {};
 
@@ -67,7 +66,7 @@ test['closest nodes are returned even if there isn\'t enough in one bucket'] = f
     test.expect(22);
     var i, iString;
     var kBucket = new KBucket({localNodeId: new Buffer('0000', 'hex')});
-    for (i = 0; i < constants.DEFAULT_NUMBER_OF_NODES_PER_K_BUCKET; i++) {
+    for (i = 0; i < kBucket.numberOfNodesPerKBucket; i++) {
         iString = i.toString('16');
         if (iString.length < 2) {
             iString = '0' + iString;
