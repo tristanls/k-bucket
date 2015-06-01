@@ -40,6 +40,25 @@ test['adding maximum number of contacts (per K-bucket) + 1 [21]' +
     test.done();
 };
 
+test['split buckets inherit options from parent bucket'] = function (test) {
+    var OPTIONS = ['arbiter', 'localNodeId', 'root', 'numberOfNodesPerKBucket',
+                   'numberOfNodesToPing'];
+    test.expect(2 * OPTIONS.length);
+    var kBucket = new KBucket();
+    var _options = {};
+    OPTIONS.forEach(function(option){
+        _options[option] = kBucket[option];
+    });
+    for (var i = 0; i < kBucket.numberOfNodesPerKBucket + 1; i++) {
+        kBucket.add({id: new Buffer("" + i)});
+    }
+    OPTIONS.forEach(function(option){
+        test.strictEqual(kBucket.low[option], _options[option]);
+        test.strictEqual(kBucket.high[option], _options[option]);
+    });
+    test.done();
+};
+
 test['split buckets contain all added contacts'] = function (test) {
     test.expect(20 /*numberOfNodesPerKBucket*/ + 2);
     var kBucket = new KBucket({localNodeId: new Buffer('00', 'hex')});

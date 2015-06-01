@@ -4,7 +4,7 @@ index.js - Kademlia DHT K-bucket implementation as a binary tree.
 
 The MIT License (MIT)
 
-Copyright (c) 2013-2014 Tristan Slominski
+Copyright (c) 2013-2015 Tristan Slominski
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
