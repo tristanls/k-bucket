@@ -313,8 +313,20 @@ KBucket.prototype.remove = function remove (contact, bitIndex) {
 //          binary tree
 KBucket.prototype.splitAndAdd = function splitAndAdd (contact, bitIndex) {
     var self = this;
-    self.low = new KBucket({localNodeId: self.localNodeId, root: self.root});
-    self.high = new KBucket({localNodeId: self.localNodeId, root: self.root});
+    self.low = new KBucket({
+        arbiter: self.arbiter,
+        localNodeId: self.localNodeId,
+        root: self.root,
+        numberOfNodesPerKBucket: self.numberOfNodesPerKBucket,
+        numberOfNodesToPing: self.numberOfNodesToPing
+    });
+    self.high = new KBucket({
+        arbiter: self.arbiter,
+        localNodeId: self.localNodeId,
+        root: self.root,
+        numberOfNodesPerKBucket: self.numberOfNodesPerKBucket,
+        numberOfNodesToPing: self.numberOfNodesToPing
+    });
 
     bitIndex = bitIndex || 0;
 
