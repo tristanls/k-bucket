@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:tristanls/node-k-bucket.git"
+    "url": "git@github.com:tristanls/k-bucket.git"
   },
   "keywords": [
     "k-bucket",
@@ -25,7 +25,8 @@
     "Tristan Slominski <tristan.slominski@gmail.com>",
     "Mike de Boer <info@mikedeboer.nl>",
     "Conrad Pankoff <deoxxa@fknsrs.biz>",
-    "Feross Aboukhadijeh <feross@feross.org>"
+    "Feross Aboukhadijeh <feross@feross.org>",
+    "Nathan Hernandez <email@nathanph.com>"
   ],
   "license": "MIT"
 }
