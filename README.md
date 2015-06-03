@@ -114,8 +114,8 @@ As more contacts are added to the "far" k-bucket and it reaches its capacity, it
 
 #### KBucket.distance(firstId, secondId)
 
-  * `firstId`: _Buffer_ Buffer containing first id.
-  * `secondId`: _Buffer_ Buffer containing second id.
+  * `firstId`: _String (base64)_ or _Buffer_ An optional String or a Buffer representing the first node id. If a String is provided, it will be assumed to be base64 encoded and will be converted into a Buffer.
+  * `secondId`: _String (base64)_ or _Buffer_ An optional String or a Buffer representing the second node id. If a String is provided, it will be assumed to be base64 encoded and will be converted into a Buffer.
   * Return: _Integer_ The XOR distance between `firstId` and `secondId`.
 
 Finds the XOR distance between firstId and secondId.
@@ -134,7 +134,7 @@ Creates a new KBucket.
 #### kBucket.add(contact, [bitIndex])
 
   * `contact`: _Object_ The contact object to add.
-    * `id`: _Buffer_ Contact node id.
+    * `id`: _String (base64)_ or _Buffer_ An optional String or a Buffer representing the node id to add. If a String is provided, it will be assumed to be base64 encoded and will be converted into a Buffer.
     * Any satellite data that is part of the `contact` object will not be altered, only `id` is used.
   * `bitIndex`: _Integer_ _(Default: 0)_ _**CAUTION: reserved for internal use**_ The bit index to which bit to check in the `id` Buffer.
   * Return: _Object_ The k-bucket itself.
@@ -144,7 +144,7 @@ Adds a `contact` to the k-bucket.
 #### kBucket.closest(contact, n, [bitIndex])
 
   * `contact`: _Object_ The contact object to find closest contacts to.
-    * `id`: _Buffer_ Contact node id.
+    * `id`: _String (base64)_ or _Buffer_ An optional String or a Buffer representing the node id. If a String is provided, it will be assumed to be base64 encoded and will be converted into a Buffer.
     * Any satellite data that is part of the `contact` object will not be altered, only `id` is used.
   * `n`: _Integer_ The maximum number of closest contacts to return.
   * `bitIndex`: _Integer_ _(Default: 0)_ _**CAUTION: reserved for internal use**_  The bit index to which bit to check in the `id` Buffer.
@@ -170,7 +170,7 @@ Determines whether the `id` at the `bitIndex` is 0 or 1. If 0, returns -1, else 
 
 #### kBucket.get(id, [bitIndex])
 
-  * `id`: _Buffer_ The ID of the `contact` to fetch
+  * `id`: _String (base64)_ or _Buffer_ An optional String or a Buffer representing the `contact` to fetch. If a String is provided, it will be assumed to be base64 encoded and will be converted into a Buffer.
   * `bitIndex`: _Integer_ _(Default: 0)_ _**CAUTION: reserved for internal use**_  The bit index to which bit to check in the `id` Buffer.
   * Return: _Object_ The `contact` if available, otherwise null
 
@@ -192,7 +192,7 @@ _NOTE: `kBucket.indexOf(contact)` does not use `arbiter` in the comparison.
 #### kBucket.remove(contact, [bitIndex])
 
   * `contact`: _Object_ The contact object to remove.
-    * `id`: _Buffer_ contact node id.
+    * `id`: _String (base64)_ or _Buffer_ An optional String or a Buffer representing the node id to remove. If a String is provided, it will be assumed to be base64 encoded and will be converted into a Buffer.
     * Any satellite data can be part of the `contact` object, only `id` is used
   * `bitIndex`: _Integer_ _(Default: 0)_ _**CAUTION: reserved for internal use**_  The bit index to which bit to check in the `id` Buffer.
   * Return: _Object_ The k-bucket itself.

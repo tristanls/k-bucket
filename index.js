@@ -75,9 +75,12 @@ var KBucket = module.exports = function KBucket (options) {
     // and the most-recently-contaced at the "back/right" side
     self.bucket = [];
     self.localNodeId = options.localNodeId || crypto.randomBytes(20);
-    if (!(self.localNodeId instanceof Buffer)) {
+
+    // If localNodeId is a string, assume it's base64 and convert it to a Buffer.
+    if (typeof self.localNodeId === "string" || self.localNodeId instanceof String) {
         self.localNodeId = new Buffer(self.localNodeId, 'base64');
     }
+
     self.numberOfNodesPerKBucket = options.numberOfNodesPerKBucket || 20;
     self.numberOfNodesToPing = options.numberOfNodesToPing || 3;
     self.root = options.root || self;
@@ -91,6 +94,16 @@ var KBucket = module.exports = function KBucket (options) {
 util.inherits(KBucket, events.EventEmitter);
 
 KBucket.distance = function distance (firstId, secondId) {
+    // If firstId is a string, assume it's base64 and convert it to a Buffer.
+    if (typeof firstId === "string" || firstId instanceof String) {
+        firstId = new Buffer(firstId, 'base64');
+    }
+
+    // If secondId is a string, assume it's base64 and convert it to a Buffer.
+    if (typeof secondId === "string" || secondId instanceof String) {
+        secondId = new Buffer(secondId, 'base64');
+    }
+
     var max = Math.max(firstId.length, secondId.length);
     var accumulator = '';
     for (var i = 0; i < max; i++) {
@@ -109,6 +122,11 @@ KBucket.distance = function distance (firstId, secondId) {
 //           the binary tree
 KBucket.prototype.add = function add (contact, bitIndex) {
     var self = this;
+
+    // If contact.id is a string, assume it's base64 and convert it to a Buffer.
+    if (typeof contact.id === "string" || contact.id instanceof String) {
+        contact.id = new Buffer(contact.id, 'base64');
+    }
 
     // first check whether we are an inner node or a leaf (with bucket contents)
     if (!self.bucket) {
@@ -161,6 +179,11 @@ KBucket.prototype.closest = function closest (contact, n, bitIndex) {
     var self = this;
 
     var contacts;
+
+    // If contact.id is a string, assume it's base64 and convert it to a Buffer.
+    if (typeof contact.id === "string" || contact.id instanceof String) {
+        contact.id = new Buffer(contact.id, 'base64');
+    }
 
     if (!self.bucket) {
         bitIndex = bitIndex || 0;
@@ -252,6 +275,11 @@ KBucket.prototype.determineBucket = function determineBucket (id, bitIndex) {
 KBucket.prototype.get = function get (id, bitIndex) {
     var self = this;
 
+    // If id is a string, assume it's base64 and convert it to a Buffer.
+    if (typeof id === "string" || id instanceof String) {
+        id = new Buffer(id, 'base64');
+    }
+
     if (!self.bucket) {
         bitIndex = bitIndex || 0;
 
@@ -285,6 +313,11 @@ KBucket.prototype.indexOf = function indexOf (contact) {
 //           the binary tree
 KBucket.prototype.remove = function remove (contact, bitIndex) {
     var self = this;
+
+    // If contact.id is a string, assume it's base64 and convert it to a Buffer.
+    if (typeof contact.id === "string" || contact.id instanceof String) {
+        contact.id = new Buffer(contact.id, 'base64');
+    }
 
     // first check whether we are an inner node or a leaf (with bucket contents)
     if (!self.bucket) {
