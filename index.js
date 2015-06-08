@@ -43,11 +43,9 @@ var util = require('util');
         `arbiter` function that givent two `contact` objects with the same `id`
         returns the desired object to be used for updating the k-bucket. For
         more details, see [arbiter function](#arbiter-function).
-    * `localNodeId`: _String (base64)_ or _Buffer_ An optional String or a
-        Buffer representing the local node id. If not provided, a local node id
-        will be created via `crypto.randomBytes(20)`. If a String is provided,
-        it will be assumed to be base64 encoded and will be converted into a
-        Buffer.
+    * `localNodeId`: _Buffer_ An optional Buffer representing the local node id.
+        If not provided, a local node id will be created via
+        `crypto.randomBytes(20)`.
     * `numberOfNodesPerKBucket`: _Integer_ _(Default: 20)_ The number of nodes
         that a k-bucket can contain before being full or split.
     * `numberOfNodesToPing`: _Integer_ _(Default: 3)_ The number of nodes to
@@ -75,8 +73,8 @@ var KBucket = module.exports = function KBucket (options) {
     // and the most-recently-contaced at the "back/right" side
     self.bucket = [];
     self.localNodeId = options.localNodeId || crypto.randomBytes(20);
-    if (!(self.localNodeId instanceof Buffer)) {
-        self.localNodeId = new Buffer(self.localNodeId, 'base64');
+    if (!Buffer.isBuffer(self.localNodeId)) {
+        throw new Error("localNodeId is not a Buffer");
     }
     self.numberOfNodesPerKBucket = options.numberOfNodesPerKBucket || 20;
     self.numberOfNodesToPing = options.numberOfNodesToPing || 3;

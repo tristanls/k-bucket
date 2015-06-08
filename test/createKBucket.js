@@ -1,5 +1,7 @@
 "use strict";
 
+var bufferEqual = require('buffer-equal');
+
 var KBucket = require('../index.js');
 
 var test = module.exports = {};
@@ -17,22 +19,22 @@ test['localNodeId is a Buffer populated from options if options.localNodeId Buff
     test.expect(2);
     var kBucket = new KBucket({localNodeId: localNodeId});
     test.ok(kBucket.localNodeId instanceof Buffer);
-    test.equal(kBucket.localNodeId, localNodeId);
+    test.ok(bufferEqual(kBucket.localNodeId, localNodeId));
     test.done();
 };
 
-test['localNodeId is a Buffer populated from options if options.localNodeId String is provided'] = function (test) {
+test['throws exception if options.localNodeId is a String'] = function (test) {
     var localNodeId = "some identifier";
-    test.expect(2);
-    var kBucket = new KBucket({localNodeId: localNodeId});
-    test.ok(kBucket.localNodeId instanceof Buffer);
-    test.deepEqual(kBucket.localNodeId, new Buffer("some identifier", 'base64'));
+    test.expect(1);
+    test.throws(function() {
+        new KBucket({localNodeId: "some identifier"});
+    }, Error);
     test.done();
 };
 
 test['root is \'self\' if not provided'] = function (test) {
     test.expect(1);
     var kBucket = new KBucket();
-    test.equal(kBucket.root, kBucket);
+    test.strictEqual(kBucket.root, kBucket);
     test.done();
 };
