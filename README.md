@@ -1,6 +1,6 @@
 # k-bucket
 
-_Stability: 2 - [Unstable](https://github.com/tristanls/stability-index#stability-2---unstable)_
+_Stability: 2 - [Stable](https://github.com/tristanls/stability-index#stability-2---stable)_
 
 [![NPM version](https://badge.fury.io/js/k-bucket.png)](http://npmjs.org/package/k-bucket)
 
