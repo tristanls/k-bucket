@@ -34,7 +34,7 @@ var assert = require('assert');
 var bufferEqual = require('buffer-equal');
 var crypto = require('crypto');
 var events = require('events');
-var util = require('util');
+var inherits = require('inherits');
 
 /*
   * `options`:
@@ -86,7 +86,7 @@ var KBucket = module.exports = function KBucket (options) {
     self.high = null;
 };
 
-util.inherits(KBucket, events.EventEmitter);
+inherits(KBucket, events.EventEmitter);
 
 KBucket.distance = function distance (firstId, secondId) {
     var max = Math.max(firstId.length, secondId.length);
