@@ -1,6 +1,6 @@
 {
   "name": "k-bucket",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Kademlia DHT K-bucket implementation as a binary tree",
   "scripts": {
     "test": "node scripts/test.js"
