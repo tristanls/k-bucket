@@ -10,7 +10,8 @@
     "nodeunit": "0.9.x"
   },
   "dependencies": {
-    "buffer-equal": "0.0.1"
+    "buffer-equal": "0.0.1",
+    "inherits": "^2.0.1"
   },
   "repository": {
     "type": "git",
