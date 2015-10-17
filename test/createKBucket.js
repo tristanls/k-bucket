@@ -1,6 +1,7 @@
 "use strict";
 
 var bufferEqual = require('buffer-equal');
+var events = require('events');
 
 var KBucket = require('../index.js');
 
@@ -36,5 +37,12 @@ test['root is \'self\' if not provided'] = function (test) {
     test.expect(1);
     var kBucket = new KBucket();
     test.strictEqual(kBucket.root, kBucket);
+    test.done();
+};
+
+test['inherits from EventEmitter'] = function (test) {
+    test.expect(1);
+    var kBucket = new KBucket();
+    test.ok(kBucket instanceof events.EventEmitter);
     test.done();
 };
