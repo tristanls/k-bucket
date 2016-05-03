@@ -32,7 +32,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 var assert = require('assert');
 var bufferEqual = require('buffer-equal');
-var crypto = require('crypto');
+var randomBytes = require('randombytes');
 var events = require('events');
 var inherits = require('inherits');
 
@@ -72,7 +72,7 @@ var KBucket = module.exports = function KBucket (options) {
     // the bucket array has least-recently-contacted at the "front/left" side
     // and the most-recently-contaced at the "back/right" side
     self.bucket = [];
-    self.localNodeId = options.localNodeId || crypto.randomBytes(20);
+    self.localNodeId = options.localNodeId || randomBytes(20);
     if (!Buffer.isBuffer(self.localNodeId)) {
         throw new Error("localNodeId is not a Buffer");
     }
