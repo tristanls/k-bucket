@@ -30,7 +30,6 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 "use strict";
 
-var assert = require('assert');
 var bufferEqual = require('buffer-equal');
 var randomBytes = require('randombytes');
 var events = require('events');
@@ -74,7 +73,7 @@ var KBucket = module.exports = function KBucket (options) {
     self.bucket = [];
     self.localNodeId = options.localNodeId || randomBytes(20);
     if (!Buffer.isBuffer(self.localNodeId)) {
-        throw new Error("localNodeId is not a Buffer");
+        throw new TypeError("localNodeId is not a Buffer");
     }
     self.numberOfNodesPerKBucket = options.numberOfNodesPerKBucket || 20;
     self.numberOfNodesToPing = options.numberOfNodesToPing || 3;
@@ -384,8 +383,9 @@ KBucket.prototype.toArray = function toArray () {
 KBucket.prototype.update = function update (contact, index) {
     var self = this;
     // sanity check
-    assert.ok(bufferEqual(self.bucket[index].id, contact.id),
-        "indexOf() calculation resulted in wrong index");
+    if (!bufferEqual(self.bucket[index].id, contact.id)) {
+        throw new Error("indexOf() calculation resulted in wrong index")
+    }
 
     var incumbent = self.bucket[index];
     var selection = self.arbiter(incumbent, contact);
