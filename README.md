@@ -104,11 +104,11 @@ As more contacts are added to the "far" k-bucket and it reaches its capacity, it
 **Public API**
   * [KBucket.distance(firstId, secondId)](#kbucketdistancefirstid-secondid)
   * [new KBucket(options)](#new-kbucketoptions)
-  * [kBucket.add(contact, \[bitIndex\])](#kbucketaddcontact-bitindex)
-  * [kBucket.closest(contact, n, \[bitIndex\])](#kbucketclosestcontact-n-bitindex)
+  * [kBucket.add(contact)](#kbucketaddcontact)
+  * [kBucket.closest(contact, n)](#kbucketclosestcontact-n)
   * [kBucket.count()](#kbucketcount)
-  * [kBucket.get(id, \[bitIndex\])](#kbucketgetid-bitindex)
-  * [kBucket.remove(contact, \[bitIndex\])](#kbucketremovecontact-bitindex)
+  * [kBucket.get(id)](#kbucketgetid)
+  * [kBucket.remove(contact)](#kbucketremovecontact)
   * [kBucket.toArray()](#kbuckettoarray)
 
 #### KBucket.distance(firstId, secondId)
@@ -134,23 +134,21 @@ Finds the XOR distance between firstId and secondId.
 
 Creates a new KBucket.
 
-#### kBucket.add(contact, [bitIndex])
+#### kBucket.add(contact)
 
   * `contact`: _Object_ The contact object to add.
     * `id`: _Buffer_ Contact node id.
     * Any satellite data that is part of the `contact` object will not be altered, only `id` is used.
-  * `bitIndex`: _Integer_ _(Default: 0)_ _**CAUTION: reserved for internal use**_ The bit index to which bit to check in the `id` Buffer.
   * Return: _Object_ The k-bucket itself.
 
 Adds a `contact` to the k-bucket.
 
-#### kBucket.closest(contact, n, [bitIndex])
+#### kBucket.closest(contact, n)
 
   * `contact`: _Object_ The contact object to find closest contacts to.
     * `id`: _Buffer_ Contact node id.
     * Any satellite data that is part of the `contact` object will not be altered, only `id` is used.
   * `n`: _Integer_ The maximum number of closest contacts to return.
-  * `bitIndex`: _Integer_ _(Default: 0)_ _**CAUTION: reserved for internal use**_  The bit index to which bit to check in the `id` Buffer.
   * Return: _Array_ Maximum of `n` closest contacts to the `contact`.
 
 Get the `n` closest contacts to the provided `contact`. "Closest" here means: closest according to the XOR metric of the `contact` node id.
@@ -171,10 +169,9 @@ _**CAUTION: reserved for internal use**_
 
 Determines whether the `id` at the `bitIndex` is 0 or 1. If 0, returns -1, else 1.
 
-#### kBucket.get(id, [bitIndex])
+#### kBucket.get(id)
 
   * `id`: _Buffer_ The ID of the `contact` to fetch
-  * `bitIndex`: _Integer_ _(Default: 0)_ _**CAUTION: reserved for internal use**_  The bit index to which bit to check in the `id` Buffer.
   * Return: _Object_ The `contact` if available, otherwise null
 
 Retrieves the `contact`.
@@ -192,24 +189,22 @@ Returns the index of the `contact` if it exists, returns -1 otherwise.
 
 _NOTE: `kBucket.indexOf(contact)` does not use `arbiter` in the comparison.
 
-#### kBucket.remove(contact, [bitIndex])
+#### kBucket.remove(contact)
 
   * `contact`: _Object_ The contact object to remove.
     * `id`: _Buffer_ contact node id.
     * Any satellite data can be part of the `contact` object, only `id` is used
-  * `bitIndex`: _Integer_ _(Default: 0)_ _**CAUTION: reserved for internal use**_  The bit index to which bit to check in the `id` Buffer.
   * Return: _Object_ The k-bucket itself.
 
 Removes the `contact`.
 
-#### kBucket.splitAndAdd(contact, [bitIndex])
+#### kBucket.splitAndAdd(contact)
 
 _**CAUTION: reserved for internal use**_
 
   * `contact`: _Object_ The contact object to add.
     * `id`: _Buffer_ Contact node id.
     * Any satellite data that is part of the `contact` object will not be altered, only `id` is used.
-  * `bitIndex`: _Integer_ _(Default: 0)_ The bit index to which bit to check in the `id` Buffer.
   * Return: _Object_ The k-bucket itself.
 
 Splits the bucket, redistributes contacts to the new buckets, and marks the bucket that was split as an inner node of the binary tree of buckets by setting `self.bucket = undefined`. Also, marks the "far away" bucket as `dontSplit`.
