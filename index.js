@@ -32,8 +32,6 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 var bufferEqual = require('buffer-equal');
 var randomBytes = require('randombytes');
-var events = require('events');
-var inherits = require('inherits');
 
 /*
   * `options`:
@@ -49,16 +47,18 @@ var inherits = require('inherits');
         that a k-bucket can contain before being full or split.
     * `numberOfNodesToPing`: _Integer_ _(Default: 3)_ The number of nodes to
         ping when a bucket that should not be split becomes full. KBucket will
-        emit a `ping` event that contains `numberOfNodesToPing` nodes that have
+        call the `ping` callback that contains `numberOfNodesToPing` nodes that have
         not been contacted the longest.
-    * `root`: _Object_ _**CAUTION: reserved for internal use**_ Provides a
-        reference to the root of the tree data structure as the k-bucket splits
-        when new contacts are added.
+    * `ping`: _Function_ _(Default: no-op)_
+        `function (oldContacts, newContact) {}` Callback called every time a
+        contact is added that would exceed the capacity of a don't split k-bucket it belongs to.
+        * `oldContacts`: _Array_ The array of contacts to ping.
+        * `newContact`: _Object_ The new contact to be added if one of old contacts
+            does not respond.
 */
 var KBucket = module.exports = function KBucket (options) {
     var self = this;
     options = options || {};
-    events.EventEmitter.call(self);
 
     // use an arbiter from options or vectorClock arbiter by default
     self.arbiter = options.arbiter || function arbiter(incumbent, candidate) {
@@ -77,15 +77,13 @@ var KBucket = module.exports = function KBucket (options) {
     }
     self.numberOfNodesPerKBucket = options.numberOfNodesPerKBucket || 20;
     self.numberOfNodesToPing = options.numberOfNodesToPing || 3;
-    self.root = options.root || self;
+    self.ping = options.ping || function() {};
 
     // V8 hints
     self.dontSplit = null;
     self.low = null;
     self.high = null;
 };
-
-inherits(KBucket, events.EventEmitter);
 
 KBucket.distance = function distance (firstId, secondId) {
     var max = Math.max(firstId.length, secondId.length);
@@ -140,9 +138,7 @@ KBucket.prototype.add = function add (contact, bitIndex) {
         // in order to determine if they are alive
         // only if one of the pinged nodes does not respond, can the new contact
         // be added (this prevents DoS flodding with new invalid contacts)
-        self.root.emit('ping',
-            self.bucket.slice(0, self.numberOfNodesToPing),
-            contact);
+        self.ping(self.bucket.slice(0, self.numberOfNodesToPing), contact);
         return self;
     }
 
@@ -313,16 +309,16 @@ KBucket.prototype.splitAndAdd = function splitAndAdd (contact, bitIndex) {
     self.low = new KBucket({
         arbiter: self.arbiter,
         localNodeId: self.localNodeId,
-        root: self.root,
         numberOfNodesPerKBucket: self.numberOfNodesPerKBucket,
-        numberOfNodesToPing: self.numberOfNodesToPing
+        numberOfNodesToPing: self.numberOfNodesToPing,
+        ping: self.ping
     });
     self.high = new KBucket({
         arbiter: self.arbiter,
         localNodeId: self.localNodeId,
-        root: self.root,
         numberOfNodesPerKBucket: self.numberOfNodesPerKBucket,
-        numberOfNodesToPing: self.numberOfNodesToPing
+        numberOfNodesToPing: self.numberOfNodesToPing,
+        ping: self.ping
     });
 
     bitIndex = bitIndex || 0;

@@ -99,7 +99,7 @@ KBucket starts off as a single k-bucket with capacity of _k_. As contacts are ad
 
 As even more contacts are added to the "near" k-bucket, the "near" k-bucket will split again as it becomes full. However, this time it is split along the second bit of the contact node id. Again, the two newly created k-buckets are marked "near" and "far" and the "far" k-bucket is marked as _don't split_. Again, the contact nodes that existed in the old bucket are redistributed. This continues as long as nodes are being added to the "near" k-bucket, until the number of splits reaches the length of the local node id.
 
-As more contacts are added to the "far" k-bucket and it reaches its capacity, it does not split. Instead, the k-bucket emits a "ping" event (register a listener: `kBucket.on('ping', function (oldContacts, newContact) {...});` and includes an array of old contact nodes that it hasn't heard from in a while and requires you to confirm that those contact nodes still respond (literally respond to a PING RPC). If an old contact node still responds, it should be re-added (`kBucket.add(oldContact)`) back to the k-bucket. This puts the old contact on the "recently heard from" end of the list of nodes in the k-bucket. If the old contact does not respond, it should be removed (`kBucket.remove(oldContact)`) and the new contact being added now has room to be stored (`kBucket.add(newContact)`).
+As more contacts are added to the "far" k-bucket and it reaches its capacity, it does not split. Instead, the k-bucket calls the "ping" callback (`function (oldContacts, newContact) {...});` and includes an array of old contact nodes that it hasn't heard from in a while and requires you to confirm that those contact nodes still respond (literally respond to a PING RPC). If an old contact node still responds, it should be re-added (`kBucket.add(oldContact)`) back to the k-bucket. This puts the old contact on the "recently heard from" end of the list of nodes in the k-bucket. If the old contact does not respond, it should be removed (`kBucket.remove(oldContact)`) and the new contact being added now has room to be stored (`kBucket.add(newContact)`).
 
 **Public API**
   * [KBucket.distance(firstId, secondId)](#kbucketdistancefirstid-secondid)
@@ -110,7 +110,6 @@ As more contacts are added to the "far" k-bucket and it reaches its capacity, it
   * [kBucket.get(id, \[bitIndex\])](#kbucketgetid-bitindex)
   * [kBucket.remove(contact, \[bitIndex\])](#kbucketremovecontact-bitindex)
   * [kBucket.toArray()](#kbuckettoarray)
-  * [Event 'ping'](#event-ping)
 
 #### KBucket.distance(firstId, secondId)
 
@@ -123,11 +122,15 @@ Finds the XOR distance between firstId and secondId.
 #### new KBucket(options)
 
   * `options`:
-    * `arbiter`: _Function_ _(Default: vectorClock arbiter)_ `function (incumbent, candidate) { return contact; }` An optional `arbiter` function that givent two `contact` objects with the same `id` returns the desired object to be used for updating the k-bucket. For more details, see [arbiter function](#arbiter-function).
+    * `arbiter`: _Function_ _(Default: vectorClock arbiter)_
+        `function (incumbent, candidate) { return contact; }` An optional `arbiter` function that givent two `contact` objects with the same `id` returns the desired object to be used for updating the k-bucket. For more details, see [arbiter function](#arbiter-function).
     * `localNodeId`: _Buffer_ An optional Buffer representing the local node id. If not provided, a local node id will be created via `crypto.randomBytes(20)`.
     * `numberOfNodesPerKBucket`: _Integer_ _(Default: 20)_ The number of nodes that a k-bucket can contain before being full or split.
-    * `numberOfNodesToPing`: _Integer_ _(Default: 3)_ The number of nodes to ping when a bucket that should not be split becomes full. KBucket will emit a `ping` event that contains `numberOfNodesToPing` nodes that have not been contacted the longest.
-    * `root`: _Object_ _**CAUTION: reserved for internal use**_ Provides a reference to the root of the tree data structure as the k-bucket splits when new contacts are added.
+    * `numberOfNodesToPing`: _Integer_ _(Default: 3)_ The number of nodes to ping when a bucket that should not be split becomes full. KBucket will call the `ping` callback that contains `numberOfNodesToPing` nodes that have not been contacted the longest.
+    * `ping`: _Function_ _(Default: no-op)_
+        `function (oldContacts, newContact) {}` Callback called every time a contact is added that would exceed the capacity of a don't split k-bucket it belongs to.
+        * `oldContacts`: _Array_ The array of contacts to ping.
+        * `newContact`: _Object_ The new contact to be added if one of old contacts does not respond.
 
 Creates a new KBucket.
 
@@ -227,13 +230,6 @@ _**CAUTION: reserved for internal use**_
   * `index`: _Integer_ The index in the bucket where contact exists (index has already been computed in previous calculation).
 
 Updates the `contact` by using the `arbiter` function to compare the incumbent and the candidate. If `arbiter` function selects the old `contact` but the candidate is some new `contact`, then the new `contact` is abandoned. If `arbiter` function selects the old `contact` and the candidate is that same old `contact`, the `contact` is marked as most recently contacted (by being moved to the right/end of the bucket array). If `arbiter` function selects the new `contact`, the old `contact` is removed and the new `contact` is marked as most recently contacted.
-
-#### Event: 'ping'
-
-  * `oldContacts`: _Array_ The array of contacts to ping.
-  * `newContact`: _Object_ The new contact to be added if one of old contacts does not respond.
-
-Emitted every time a contact is added that would exceed the capacity of a _don't split_ k-bucket it belongs to.
 
 ## Sources
 

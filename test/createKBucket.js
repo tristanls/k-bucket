@@ -1,7 +1,6 @@
 "use strict";
 
 var bufferEqual = require('buffer-equal');
-var events = require('events');
 
 var KBucket = require('../index.js');
 
@@ -33,16 +32,9 @@ test['throws exception if options.localNodeId is a String'] = function (test) {
     test.done();
 };
 
-test['root is \'self\' if not provided'] = function (test) {
+test['ping is \'Function\' if not provided'] = function (test) {
     test.expect(1);
     var kBucket = new KBucket();
-    test.strictEqual(kBucket.root, kBucket);
-    test.done();
-};
-
-test['inherits from EventEmitter'] = function (test) {
-    test.expect(1);
-    var kBucket = new KBucket();
-    test.ok(kBucket instanceof events.EventEmitter);
+    test.ok(kBucket.ping instanceof Function);
     test.done();
 };
