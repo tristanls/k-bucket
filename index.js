@@ -30,7 +30,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 "use strict";
 
-var bufferEqual = require('buffer-equal');
+var bufferEquals = require('buffer-equals');
 var randomBytes = require('randombytes');
 
 /*
@@ -268,7 +268,7 @@ KBucket.prototype.get = function get (id, bitIndex) {
 KBucket.prototype.indexOf = function indexOf (contact) {
     var self = this;
     for (var i = 0; i < self.bucket.length; i++) {
-        if (bufferEqual(self.bucket[i].id, contact.id)) return i;
+        if (bufferEquals(self.bucket[i].id, contact.id)) return i;
     }
     return -1;
 };
@@ -379,7 +379,7 @@ KBucket.prototype.toArray = function toArray () {
 KBucket.prototype.update = function update (contact, index) {
     var self = this;
     // sanity check
-    if (!bufferEqual(self.bucket[index].id, contact.id)) {
+    if (!bufferEquals(self.bucket[index].id, contact.id)) {
         throw new Error("indexOf() calculation resulted in wrong index")
     }
 
