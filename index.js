@@ -99,6 +99,9 @@ KBucket.distance = function distance (firstId, secondId) {
     return parseInt(accumulator, 16);
 };
 
+// contact: *required* the contact object to add
+// bitIndex: the bitIndex to which bit to check in the Buffer for navigating
+//           the binary tree
 KBucket.prototype._add = function (contact, bitIndex) {
     var self = this;
 
@@ -148,6 +151,11 @@ KBucket.prototype.add = function add (contact) {
     return this._add(contact, 0);
 };
 
+// contact: Object *required* contact object
+//   id: Buffer *require* node id
+// n: Integer *required* maximum number of closest contacts to return
+// bitIndex: Integer (Default: 0)
+// Return: Array of maximum of `n` closest contacts to the `contact`
 KBucket.prototype._closest = function (contact, n, bitIndex) {
     var self = this;
 
@@ -242,6 +250,13 @@ KBucket.prototype.determineBucket = function determineBucket (id, bitIndex) {
     return -1;
 };
 
+// Get a contact by its exact ID.
+// If this is a leaf, loop through the bucket contents and return the correct
+// contact if we have it or null if not. If this is an inner node, determine
+// which branch of the tree to traverse and repeat.
+// id: *required* a Buffer specifying the ID of the contact to fetch
+// bitIndex: the bitIndex to which bit to check in the Buffer for navigating
+//           the binary tree
 KBucket.prototype._get = function (id, bitIndex) {
     var self = this;
 
@@ -283,6 +298,9 @@ KBucket.prototype.indexOf = function indexOf (contact) {
     return -1;
 };
 
+// contact: *required* the contact object to remove
+// bitIndex: the bitIndex to which bit to check in the Buffer for navigating
+//           the binary tree
 KBucket.prototype._remove = function (contact, bitIndex) {
     var self = this;
 
