@@ -142,6 +142,9 @@ KBucket.prototype._add = function (contact, bitIndex) {
 
 // contact: *required* the contact object to add
 KBucket.prototype.add = function add (contact) {
+    if (!Buffer.isBuffer(contact.id)) {
+        throw new TypeError("contact.id is not a Buffer");
+    }
     return this._add(contact, 0);
 };
 
@@ -180,6 +183,9 @@ KBucket.prototype._closest = function (contact, n, bitIndex) {
 // n: Integer *required* maximum number of closest contacts to return
 // Return: Array of maximum of `n` closest contacts to the `contact`
 KBucket.prototype.closest = function (contact, n) {
+    if (!Buffer.isBuffer(contact.id)) {
+        throw new TypeError("contact.id is not a Buffer");
+    }
     return this._closest(contact, n, 0);
 };
 
@@ -261,6 +267,9 @@ KBucket.prototype._get = function (id, bitIndex) {
 // which branch of the tree to traverse and repeat.
 // id: *required* a Buffer specifying the ID of the contact to fetch
 KBucket.prototype.get = function get (id) {
+    if (!Buffer.isBuffer(id)) {
+        throw new TypeError("id is not a Buffer");
+    }
     return this._get(id, 0);
 };
 
@@ -296,6 +305,9 @@ KBucket.prototype._remove = function (contact, bitIndex) {
 
 // contact: *required* the contact object to remove
 KBucket.prototype.remove = function remove (contact) {
+    if (!Buffer.isBuffer(contact.id)) {
+        throw new TypeError("contact.id is not a Buffer");
+    }
     return this._remove(contact, 0);
 };
 
