@@ -3,6 +3,7 @@
   "version": "2.0.0",
   "description": "Kademlia DHT K-bucket implementation as a binary tree",
   "scripts": {
+    "distance-benchmark": "node benchmarks/distance.js",
     "test": "node scripts/test.js"
   },
   "main": "index.js",
