@@ -4,6 +4,16 @@ var KBucket = require('../index.js');
 
 var test = module.exports = {};
 
+test['throws TypeError if contact.id is not a Buffer'] = function (test) {
+    test.expect(1);
+    var kBucket = new KBucket();
+    var contact = {id: "foo"};
+    test.throws(function () {
+        kBucket.remove(contact);
+    }, TypeError);
+    test.done();
+};
+
 test['removing a contact should remove contact from nested buckets'] = function (test) {
     test.expect(2);
     var kBucket = new KBucket({localNodeId: new Buffer('0000', 'hex')});

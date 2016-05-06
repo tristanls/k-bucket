@@ -4,6 +4,16 @@ var KBucket = require('../index.js');
 
 var test = module.exports = {};
 
+test['throws TypeError if contact.id is not a Buffer'] = function (test) {
+    test.expect(1);
+    var kBucket = new KBucket();
+    var contact = {id: "foo"};
+    test.throws(function () {
+        kBucket.add(contact);
+    }, TypeError);
+    test.done();
+};
+
 test['adding a contact places it in bucket'] = function (test) {
     test.expect(1);
     var kBucket = new KBucket();

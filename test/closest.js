@@ -4,6 +4,16 @@ var KBucket = require('../index.js');
 
 var test = module.exports = {};
 
+test['throws TypeError if contact.id is not a Buffer'] = function (test) {
+    test.expect(1);
+    var kBucket = new KBucket();
+    var contact = {id: "foo"};
+    test.throws(function () {
+        kBucket.closest(contact, 4);
+    }, TypeError);
+    test.done();
+};
+
 test['closest nodes are returned'] = function (test) {
     test.expect(3);
     var kBucket = new KBucket();
