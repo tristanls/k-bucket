@@ -137,7 +137,7 @@ KBucket.prototype._add = function (contact, bitIndex) {
         return self;
     }
 
-    return self._splitAndAdd(contact, bitIndex);
+    return self.splitAndAdd(contact, bitIndex);
 };
 
 // contact: *required* the contact object to add
@@ -299,7 +299,13 @@ KBucket.prototype.remove = function remove (contact) {
     return this._remove(contact, 0);
 };
 
-KBucket.prototype._splitAndAdd = function (contact, bitIndex) {
+// Splits the bucket, redistributes contacts to the new buckets, and marks the
+// bucket that was split as an inner node of the binary tree of buckets by
+// setting self.bucket = undefined;
+// contact: *required* the contact object to add
+// bitIndex: the bitIndex to which byte to check in the Buffer for navigating the
+//          binary tree
+KBucket.prototype.splitAndAdd = function splitAndAdd (contact, bitIndex) {
     var self = this;
     self.low = new KBucket({
         arbiter: self.arbiter,
@@ -315,6 +321,8 @@ KBucket.prototype._splitAndAdd = function (contact, bitIndex) {
         numberOfNodesToPing: self.numberOfNodesToPing,
         ping: self.ping
     });
+
+    bitIndex = bitIndex || 0;
 
     // redistribute existing contacts amongst the two newly created buckets
     self.bucket.forEach(function (storedContact) {
@@ -341,14 +349,6 @@ KBucket.prototype._splitAndAdd = function (contact, bitIndex) {
     self._add(contact, bitIndex);
 
     return self;
-};
-
-// Splits the bucket, redistributes contacts to the new buckets, and marks the
-// bucket that was split as an inner node of the binary tree of buckets by
-// setting self.bucket = undefined;
-// contact: *required* the contact object to add
-KBucket.prototype.splitAndAdd = function splitAndAdd (contact) {
-    return this._splitAndAdd(contact, 0);
 };
 
 // Returns all the contacts contained in the tree as an array.

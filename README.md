@@ -198,13 +198,14 @@ _NOTE: `kBucket.indexOf(contact)` does not use `arbiter` in the comparison.
 
 Removes the `contact`.
 
-#### kBucket.splitAndAdd(contact)
+#### kBucket.splitAndAdd(contact, [bitIndex])
 
 _**CAUTION: reserved for internal use**_
 
   * `contact`: _Object_ The contact object to add.
     * `id`: _Buffer_ Contact node id.
     * Any satellite data that is part of the `contact` object will not be altered, only `id` is used.
+  * `bitIndex`: _Integer_ _(Default: 0)_ The bit index to which bit to check in the `id` Buffer.
   * Return: _Object_ The k-bucket itself.
 
 Splits the bucket, redistributes contacts to the new buckets, and marks the bucket that was split as an inner node of the binary tree of buckets by setting `self.bucket = undefined`. Also, marks the "far away" bucket as `dontSplit`.
