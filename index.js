@@ -110,7 +110,7 @@ KBucket.prototype._add = function (contact, bitIndex) {
         // this is not a leaf node but an inner node with 'low' and 'high'
         // branches; we will check the appropriate bit of the identifier and
         // delegate to the appropriate node for further processing
-        if (self.determineBucket(contact.id, bitIndex++) < 0) {
+        if (self._determineBucket(contact.id, bitIndex++) < 0) {
             return self.low._add(contact, bitIndex);
         } else {
             return self.high._add(contact, bitIndex);
@@ -118,9 +118,9 @@ KBucket.prototype._add = function (contact, bitIndex) {
     }
 
     // check if the contact already exists
-    var index = self.indexOf(contact);
+    var index = self._indexOf(contact);
     if (index >= 0) {
-        self.update(contact, index);
+        self._update(contact, index);
         return self;
     }
 
@@ -140,7 +140,7 @@ KBucket.prototype._add = function (contact, bitIndex) {
         return self;
     }
 
-    return self.splitAndAdd(contact, bitIndex);
+    return self._splitAndAdd(contact, bitIndex);
 };
 
 // contact: *required* the contact object to add
@@ -162,7 +162,7 @@ KBucket.prototype._closest = function (contact, n, bitIndex) {
     var contacts;
 
     if (!self.bucket) {
-        if (self.determineBucket(contact.id, bitIndex++) < 0) {
+        if (self._determineBucket(contact.id, bitIndex++) < 0) {
             contacts = self.low._closest(contact, n, bitIndex);
             if (contacts.length < n) {
                 contacts = contacts.concat(self.high._closest(contact, n, bitIndex));
@@ -213,7 +213,7 @@ KBucket.prototype.count = function count () {
 // Determines whether the id at the bitIndex is 0 or 1. If 0, returns -1, else 1
 // id: a Buffer to compare localNodeId with
 // bitIndex: the bitIndex to which bit to check in the id Buffer
-KBucket.prototype.determineBucket = function determineBucket (id, bitIndex) {
+KBucket.prototype._determineBucket = function (id, bitIndex) {
     var self = this;
 
     bitIndex = bitIndex || 0;
@@ -261,14 +261,14 @@ KBucket.prototype._get = function (id, bitIndex) {
     var self = this;
 
     if (!self.bucket) {
-        if (self.determineBucket(id, bitIndex++) < 0) {
+        if (self._determineBucket(id, bitIndex++) < 0) {
             return self.low._get(id, bitIndex);
         } else {
             return self.high._get(id, bitIndex);
         }
     }
 
-    var index = self.indexOf({id: id}); // index of uses contact.id for matching
+    var index = self._indexOf({id: id}); // index of uses contact.id for matching
     if (index < 0) {
         return null; // contact not found
     }
@@ -290,7 +290,7 @@ KBucket.prototype.get = function get (id) {
 
 // Returns the index of the contact if it exists
 // **NOTE**: indexOf() does not compare vectorClock
-KBucket.prototype.indexOf = function indexOf (contact) {
+KBucket.prototype._indexOf = function indexOf (contact) {
     var self = this;
     for (var i = 0; i < self.bucket.length; i++) {
         if (bufferEquals(self.bucket[i].id, contact.id)) return i;
@@ -309,14 +309,14 @@ KBucket.prototype._remove = function (contact, bitIndex) {
         // this is not a leaf node but an inner node with 'low' and 'high'
         // branches; we will check the appropriate bit of the identifier and
         // delegate to the appropriate node for further processing
-        if (self.determineBucket(contact.id, bitIndex++) < 0) {
+        if (self._determineBucket(contact.id, bitIndex++) < 0) {
             return self.low._remove(contact, bitIndex);
         } else {
             return self.high._remove(contact, bitIndex);
         }
     }
 
-    var index = self.indexOf(contact);
+    var index = self._indexOf(contact);
     if (index >= 0) self.bucket.splice(index, 1);
     return self;
 };
@@ -335,7 +335,7 @@ KBucket.prototype.remove = function remove (contact) {
 // contact: *required* the contact object to add
 // bitIndex: the bitIndex to which byte to check in the Buffer for navigating the
 //          binary tree
-KBucket.prototype.splitAndAdd = function splitAndAdd (contact, bitIndex) {
+KBucket.prototype._splitAndAdd = function (contact, bitIndex) {
     var self = this;
     self.low = new KBucket({
         arbiter: self.arbiter,
@@ -356,7 +356,7 @@ KBucket.prototype.splitAndAdd = function splitAndAdd (contact, bitIndex) {
 
     // redistribute existing contacts amongst the two newly created buckets
     self.bucket.forEach(function (storedContact) {
-        if (self.determineBucket(storedContact.id, bitIndex) < 0) {
+        if (self._determineBucket(storedContact.id, bitIndex) < 0) {
             self.low.add(storedContact);
         } else {
             self.high.add(storedContact);
@@ -368,7 +368,7 @@ KBucket.prototype.splitAndAdd = function splitAndAdd (contact, bitIndex) {
     // don't split the "far away" bucket
     // we check where the local node would end up and mark the other one as
     // "dontSplit" (i.e. "far away")
-    if (self.determineBucket(self.localNodeId, bitIndex) < 0) {
+    if (self._determineBucket(self.localNodeId, bitIndex) < 0) {
         // local node belongs to "low" bucket, so mark the other one
         self.high.dontSplit = true;
     } else {
@@ -407,7 +407,7 @@ KBucket.prototype.toArray = function toArray () {
 // contact: *required* the contact to update
 // index: *required* the index in the bucket where contact exists
 //        (index has already been computed in a previous calculation)
-KBucket.prototype.update = function update (contact, index) {
+KBucket.prototype._update = function (contact, index) {
     var self = this;
     // sanity check
     if (!bufferEquals(self.bucket[index].id, contact.id)) {
