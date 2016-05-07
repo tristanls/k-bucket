@@ -40,6 +40,6 @@ test['distance between 0000000100100100 and 0100000000100100 is 0100000100000000
     test.expect(1);
     test.equal(
         KBucket.distance(new Buffer('0124', 'hex'), new Buffer('4024', 'hex')),
-        1040);
+        16640);
     test.done();
 };
