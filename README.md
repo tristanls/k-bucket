@@ -159,35 +159,12 @@ Get the `n` closest contacts to the provided `contact`. "Closest" here means: cl
 
 Counts the total number of contacts in the tree.
 
-#### kBucket.determineBucket(id, [bitIndex])
-
-_**CAUTION: reserved for internal use**_
-
-  * `id`: _Buffer_ Id to compare `localNodeId` with.
-  * `bitIndex`: _Integer_ _(Default: 0)_  The bit index to which bit to check in the `id` Buffer.
-  * Return: _Integer_ -1 if `id` at `bitIndex` is 0, 1 otherwise.
-
-Determines whether the `id` at the `bitIndex` is 0 or 1. If 0, returns -1, else 1.
-
 #### kBucket.get(id)
 
   * `id`: _Buffer_ The ID of the `contact` to fetch
   * Return: _Object_ The `contact` if available, otherwise null
 
 Retrieves the `contact`.
-
-#### kBucket.indexOf(contact)
-
-_**CAUTION: reserved for internal use**_
-
-  * `contact`: _Object_ The contact object.
-    * `id`: _Buffer_ Contact node id.
-    * Any satellite data that is part of the `contact` object will not be altered, only `id` is used.
-  * Return: _Integer_ Index of `contact` if it exists, -1 otherwise.
-
-Returns the index of the `contact` if it exists, returns -1 otherwise.
-
-_NOTE: `kBucket.indexOf(contact)` does not use `arbiter` in the comparison.
 
 #### kBucket.remove(contact)
 
@@ -198,7 +175,36 @@ _NOTE: `kBucket.indexOf(contact)` does not use `arbiter` in the comparison.
 
 Removes the `contact`.
 
-#### kBucket.splitAndAdd(contact, [bitIndex])
+#### kBucket.toArray()
+
+  * Return: _Array_ All of the contacts in the tree, as an array
+
+Traverses the tree, putting all the contacts into one array.
+
+#### kBucket._determineBucket(id, [bitIndex])
+
+_**CAUTION: reserved for internal use**_
+
+  * `id`: _Buffer_ Id to compare `localNodeId` with.
+  * `bitIndex`: _Integer_ _(Default: 0)_  The bit index to which bit to check in the `id` Buffer.
+  * Return: _Integer_ -1 if `id` at `bitIndex` is 0, 1 otherwise.
+
+Determines whether the `id` at the `bitIndex` is 0 or 1. If 0, returns -1, else 1.
+
+#### kBucket._indexOf(contact)
+
+_**CAUTION: reserved for internal use**_
+
+  * `contact`: _Object_ The contact object.
+    * `id`: _Buffer_ Contact node id.
+    * Any satellite data that is part of the `contact` object will not be altered, only `id` is used.
+  * Return: _Integer_ Index of `contact` if it exists, -1 otherwise.
+
+Returns the index of the `contact` if it exists, returns -1 otherwise.
+
+_NOTE: `kBucket._indexOf(contact)` does not use `arbiter` in the comparison.
+
+#### kBucket._splitAndAdd(contact, [bitIndex])
 
 _**CAUTION: reserved for internal use**_
 
@@ -210,13 +216,7 @@ _**CAUTION: reserved for internal use**_
 
 Splits the bucket, redistributes contacts to the new buckets, and marks the bucket that was split as an inner node of the binary tree of buckets by setting `self.bucket = undefined`. Also, marks the "far away" bucket as `dontSplit`.
 
-#### kBucket.toArray()
-
-  * Return: _Array_ All of the contacts in the tree, as an array
-
-Traverses the tree, putting all the contacts into one array.
-
-#### kBucket.update(contact, index)
+#### kBucket._update(contact, index)
 
 _**CAUTION: reserved for internal use**_
 
