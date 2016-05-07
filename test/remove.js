@@ -29,8 +29,8 @@ test['removing a contact should remove contact from nested buckets'] = function 
     kBucket.add({id: new Buffer('00' + iString, 'hex')});
     // console.log(require('util').inspect(kBucket, false, null));
     var contactToDelete = {id: new Buffer('8000', 'hex')};
-    test.equal(kBucket.high.indexOf(contactToDelete), 0);
+    test.equal(kBucket.high._indexOf(contactToDelete), 0);
     kBucket.remove({id: new Buffer('8000', 'hex')});
-    test.equal(kBucket.high.indexOf(contactToDelete), -1);
+    test.equal(kBucket.high._indexOf(contactToDelete), -1);
     test.done();
 };
