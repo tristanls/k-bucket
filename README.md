@@ -232,4 +232,4 @@ Updates the `contact` by using the `arbiter` function to compare the incumbent a
 The implementation has been sourced from:
 
   - [A formal specification of the Kademlia distributed hash table](http://maude.sip.ucm.es/kademlia/files/pita_kademlia.pdf)
-  - [Distributed Hash Tables (part 2)](http://offthelip.org/?p=157)
+  - [Distributed Hash Tables (part 2)](https://web.archive.org/web/20140217064545/http://offthelip.org/?p=157)
