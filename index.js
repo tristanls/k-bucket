@@ -86,17 +86,16 @@ var KBucket = module.exports = function KBucket (options) {
 };
 
 KBucket.distance = function distance (firstId, secondId) {
+    var distance = 0;
+    var min = Math.min(firstId.length, secondId.length);
     var max = Math.max(firstId.length, secondId.length);
-    var accumulator = '';
-    for (var i = 0; i < max; i++) {
-        var maxDistance = (firstId[i] === undefined || secondId[i] === undefined);
-        if (maxDistance) {
-            accumulator += (255).toString(16);
-        } else {
-            accumulator += (firstId[i] ^ secondId[i]).toString(16);
-        }
+    for (var i = 0; i < min; ++i) {
+        distance = distance * 256 + (firstId[i] ^ secondId[i]);
     }
-    return parseInt(accumulator, 16);
+    for (; i < max; ++i) {
+        distance = distance * 256 + 255;
+    }
+    return distance;
 };
 
 // contact: *required* the contact object to add
