@@ -54,7 +54,10 @@ test['adding contact to bucket that can\'t be split results in calling' +
      ' "ping" callback'] = function (test) {
     var i, iString, j;
     test.expect(3 /*numberOfNodesToPing*/ + 2);
-    var ping = function (contacts, replacement) {
+    var kBucket = new KBucket({
+        localNodeId: new Buffer('0000', 'hex')
+    });
+    kBucket.on('ping', function (contacts, replacement) {
         test.equal(contacts.length, kBucket.numberOfNodesToPing);
         // console.dir(kBucket.high.bucket[0]);
         for (var i = 0; i < kBucket.numberOfNodesToPing; i++) {
@@ -63,11 +66,7 @@ test['adding contact to bucket that can\'t be split results in calling' +
         }
         test.deepEqual(replacement, {id: new Buffer(iString, 'hex')})
         test.done();
-    };
-    var kBucket = new KBucket({
-        localNodeId: new Buffer('0000', 'hex'),
-        ping: ping
-    });
+    })
     for (var j = 0; j < kBucket.numberOfNodesPerKBucket + 1; j++) {
         iString = j.toString('16');
         if (iString.length < 2) {
@@ -76,4 +75,16 @@ test['adding contact to bucket that can\'t be split results in calling' +
         iString = '80' + iString; // make sure all go into "far away" bucket
         kBucket.add({id: new Buffer(iString, 'hex')});
     }
+};
+
+test['should generate event "add" once'] = function (test) {
+    test.expect(1);
+    var kBucket = new KBucket();
+    var contact = {id: new Buffer("a")};
+    kBucket.on('add', function (newContact) {
+        test.deepEqual(newContact, contact);
+    })
+    kBucket.add(contact);
+    kBucket.add(contact);
+    test.done();
 };

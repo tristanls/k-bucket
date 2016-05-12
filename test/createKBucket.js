@@ -31,10 +31,3 @@ test['throws exception if options.localNodeId is a String'] = function (test) {
     }, Error);
     test.done();
 };
-
-test['ping is \'Function\' if not provided'] = function (test) {
-    test.expect(1);
-    var kBucket = new KBucket();
-    test.ok(kBucket.ping instanceof Function);
-    test.done();
-};
