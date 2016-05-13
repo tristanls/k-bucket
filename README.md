@@ -254,6 +254,22 @@ Emitted when `contact` was removed from the bucket.
 
 Emitted when a previously existing ("previously existing" means `oldContact.id` equals `newContact.id`) contact was added to the bucket and it was replaced with `newContact`.
 
+## Releases
+
+[Current releases](https://github.com/tristanls/k-bucket/releases).
+
+### Policy
+
+We follow the semantic versioning policy ([semver.org](http://semver.org/)) with a caveat:
+
+> Given a version number MAJOR.MINOR.PATCH, increment the:
+>
+>MAJOR version when you make incompatible API changes,<br/>
+>MINOR version when you add functionality in a backwards-compatible manner, and<br/>
+>PATCH version when you make backwards-compatible bug fixes.
+
+**caveat**: Major version zero is a special case indicating development version that may make incompatible API changes without incrementing MAJOR version.
+
 ## Sources
 
 The implementation has been sourced from:
