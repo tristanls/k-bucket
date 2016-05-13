@@ -110,10 +110,10 @@ As more contacts are added to the "far" k-bucket and it reaches its capacity, it
   * [kBucket.get(id)](#kbucketgetid)
   * [kBucket.remove(contact)](#kbucketremovecontact)
   * [kBucket.toArray()](#kbuckettoarray)
+  * [Event 'added'](#event-added)
   * [Event 'ping'](#event-ping)
-  * [Event 'add'](#event-add)
-  * [Event 'update'](#event-update)
-  * [Event 'remove'](#event-remove)
+  * [Event 'removed'](#event-removed)
+  * [Event 'updated'](#event-updated)
 
 #### KBucket.distance(firstId, secondId)
 
@@ -130,11 +130,8 @@ Finds the XOR distance between firstId and secondId.
         `function (incumbent, candidate) { return contact; }` An optional `arbiter` function that givent two `contact` objects with the same `id` returns the desired object to be used for updating the k-bucket. For more details, see [arbiter function](#arbiter-function).
     * `localNodeId`: _Buffer_ An optional Buffer representing the local node id. If not provided, a local node id will be created via `crypto.randomBytes(20)`.
     * `numberOfNodesPerKBucket`: _Integer_ _(Default: 20)_ The number of nodes that a k-bucket can contain before being full or split.
-    * `numberOfNodesToPing`: _Integer_ _(Default: 3)_ The number of nodes to ping when a bucket that should not be split becomes full. KBucket will call the `ping` callback that contains `numberOfNodesToPing` nodes that have not been contacted the longest.
-    * `ping`: _Function_ _(Default: no-op)_
-        `function (oldContacts, newContact) {}` Callback called every time a contact is added that would exceed the capacity of a don't split k-bucket it belongs to.
-        * `oldContacts`: _Array_ The array of contacts to ping.
-        * `newContact`: _Object_ The new contact to be added if one of old contacts does not respond.
+    * `numberOfNodesToPing`: _Integer_ _(Default: 3)_ The number of nodes to ping when a bucket that should not be split becomes full. KBucket will emit a `ping` event that contains `numberOfNodesToPing` nodes that have not been contacted the longest.
+    * `root`: _Object_ _**CAUTION: reserved for internal use**_ Provides a reference to the root of the tree data structure as the k-bucket splits when new contacts are added.
 
 Creates a new KBucket.
 
@@ -231,6 +228,12 @@ _**CAUTION: reserved for internal use**_
 
 Updates the `contact` by using the `arbiter` function to compare the incumbent and the candidate. If `arbiter` function selects the old `contact` but the candidate is some new `contact`, then the new `contact` is abandoned. If `arbiter` function selects the old `contact` and the candidate is that same old `contact`, the `contact` is marked as most recently contacted (by being moved to the right/end of the bucket array). If `arbiter` function selects the new `contact`, the old `contact` is removed and the new `contact` is marked as most recently contacted.
 
+#### Event: 'added'
+
+  * `newContact`: _Object_ The new contact that was added.
+
+Emitted only when `contact` was added to bucket and it was not stored in the bucket before.
+
 #### Event: 'ping'
 
   * `oldContacts`: _Array_ The array of contacts to ping.
@@ -238,20 +241,18 @@ Updates the `contact` by using the `arbiter` function to compare the incumbent a
 
 Emitted every time a contact is added that would exceed the capacity of a _don't split_ k-bucket it belongs to.
 
-#### Event: 'add'
+#### Event: 'removed'
 
-  * `newContact`: _Object_ The new contact that was added.
+  * `contact`: _Object_ The contact that was removed.
 
-Emitted only when contact was really added to bucket.
+Emitted when `contact` was removed from the bucket.
 
-#### Event: 'update'
+#### Event: 'updated'
 
-  * `oldContact`: _Object_
-  * `newContact`: _Object_
+  * `oldContact`: _Object_ The contact that was stored prior to the update.
+  * `newContact`: _Object_ The new contact that is now stored after the update.
 
-#### Event: 'remove'
-
-  * `contact`: _Object_
+Emitted when a previously existing ("previously existing" means `oldContact.id` equals `newContact.id`) contact was added to the bucket and it was replaced with `newContact`.
 
 ## Sources
 

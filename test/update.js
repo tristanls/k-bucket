@@ -54,12 +54,12 @@ test['more recent vectorClock results in contact update and contact being' +
     test.done();
 };
 
-test['should generate "update"'] = function (test) {
+test['should generate "updated"'] = function (test) {
     test.expect(2);
     var kBucket = new KBucket();
     var contact1 = {id: new Buffer("a"), vectorClock: 1};
     var contact2 = {id: new Buffer("a"), vectorClock: 2};
-    kBucket.on('update', function (oldContact, newContact) {
+    kBucket.on('updated', function (oldContact, newContact) {
         test.deepEqual(oldContact, contact1);
         test.deepEqual(newContact, contact2);
     })

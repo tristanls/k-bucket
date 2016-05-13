@@ -77,13 +77,13 @@ test['adding contact to bucket that can\'t be split results in calling' +
     }
 };
 
-test['should generate event "add" once'] = function (test) {
+test['should generate event "added" once'] = function (test) {
     test.expect(1);
     var kBucket = new KBucket();
     var contact = {id: new Buffer("a")};
-    kBucket.on('add', function (newContact) {
+    kBucket.on('added', function (newContact) {
         test.deepEqual(newContact, contact);
-    })
+    });
     kBucket.add(contact);
     kBucket.add(contact);
     test.done();

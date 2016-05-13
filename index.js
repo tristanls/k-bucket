@@ -4,7 +4,7 @@ index.js - Kademlia DHT K-bucket implementation as a binary tree.
 
 The MIT License (MIT)
 
-Copyright (c) 2013-2015 Tristan Slominski
+Copyright (c) 2013-2016 Tristan Slominski
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
@@ -30,9 +30,9 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 "use strict";
 
+var bufferEquals = require('buffer-equals');
 var EventEmitter = require('events').EventEmitter;
 var inherits = require('inherits');
-var bufferEquals = require('buffer-equals');
 var randomBytes = require('randombytes');
 
 /*
@@ -49,7 +49,7 @@ var randomBytes = require('randombytes');
         that a k-bucket can contain before being full or split.
     * `numberOfNodesToPing`: _Integer_ _(Default: 3)_ The number of nodes to
         ping when a bucket that should not be split becomes full. KBucket will
-        call the `ping` callback that contains `numberOfNodesToPing` nodes that have
+        emit a `ping` event that contains `numberOfNodesToPing` nodes that have
         not been contacted the longest.
     * `root`: _Object_ _**CAUTION: reserved for internal use**_ Provides a
         reference to the root of the tree data structure as the k-bucket splits
@@ -127,7 +127,7 @@ KBucket.prototype._add = function (contact, bitIndex) {
 
     if (self.bucket.length < self.numberOfNodesPerKBucket) {
         self.bucket.push(contact);
-        self.emit('add', contact);
+        self.emit('added', contact);
         return self;
     }
 
@@ -321,7 +321,7 @@ KBucket.prototype._remove = function (contact, bitIndex) {
     var index = self._indexOf(contact);
     if (index >= 0) {
         self.bucket.splice(index, 1);
-        self.emit('remove', contact);
+        self.emit('removed', contact);
     }
     return self;
 };
@@ -429,5 +429,5 @@ KBucket.prototype._update = function (contact, index) {
 
     self.bucket.splice(index, 1); // remove old contact
     self.bucket.push(selection); // add more recent contact version
-    self.emit('update', incumbent, selection);
+    self.emit('updated', incumbent, selection);
 };

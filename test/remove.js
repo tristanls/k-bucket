@@ -35,13 +35,13 @@ test['removing a contact should remove contact from nested buckets'] = function 
     test.done();
 };
 
-test['should generate "remove"'] = function (test) {
+test['should generate "removed"'] = function (test) {
     test.expect(1);
     var kBucket = new KBucket();
     var contact = {id: new Buffer("a")};
-    kBucket.on('remove', function (removedContact) {
+    kBucket.on('removed', function (removedContact) {
         test.deepEqual(removedContact, contact);
-    })
+    });
     kBucket.add(contact);
     kBucket.remove(contact);
     test.done();
