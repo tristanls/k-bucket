@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "buffer-equals": "^1.0.3",
+    "inherits": "^2.0.1",
     "randombytes": "^2.0.3"
   },
   "repository": {
