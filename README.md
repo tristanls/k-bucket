@@ -232,7 +232,7 @@ Updates the `contact` by using the `arbiter` function to compare the incumbent a
 
   * `newContact`: _Object_ The new contact that was added.
 
-Emitted only when `contact` was added to bucket and it was not stored in the bucket before.
+Emitted only when `newContact` was added to bucket and it was not stored in the bucket before.
 
 #### Event: 'ping'
 
