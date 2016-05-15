@@ -9,7 +9,7 @@ test['throws TypeError if contact.id is not a Buffer'] = function (test) {
     var kBucket = new KBucket();
     var contact = {id: "foo"};
     test.throws(function () {
-        kBucket.closest(contact, 4);
+        kBucket.closest(contact.id, 4);
     }, TypeError);
     test.done();
 };
@@ -36,7 +36,7 @@ test['closest nodes are returned'] = function (test) {
     kBucket.add({id: new Buffer('10', 'hex')}); // 00010000
     kBucket.add({id: new Buffer('11', 'hex')}); // 00010001
     var contact = {id: new Buffer('15', 'hex')};// 00010101
-    var contacts = kBucket.closest(contact, 3);
+    var contacts = kBucket.closest(contact.id, 3);
     test.deepEqual(contacts[0].id, new Buffer('11', 'hex')); // distance: 00000100
     test.deepEqual(contacts[1].id, new Buffer('10', 'hex')); // distance: 00000101
     test.deepEqual(contacts[2].id, new Buffer('05', 'hex')); // distance: 00010000
@@ -65,7 +65,7 @@ test['closest nodes are returned (including exact match)'] = function (test) {
     kBucket.add({id: new Buffer('10', 'hex')}); // 00010000
     kBucket.add({id: new Buffer('11', 'hex')}); // 00010001
     var contact = {id: new Buffer('11', 'hex')};// 00010001
-    var contacts = kBucket.closest(contact, 3);
+    var contacts = kBucket.closest(contact.id, 3);
     test.deepEqual(contacts[0].id, new Buffer('11', 'hex')); // distance: 00000000
     test.deepEqual(contacts[1].id, new Buffer('10', 'hex')); // distance: 00000001
     test.deepEqual(contacts[2].id, new Buffer('01', 'hex')); // distance: 00010000
@@ -88,7 +88,7 @@ test['closest nodes are returned even if there isn\'t enough in one bucket'] = f
     }
     kBucket.add({id: new Buffer('0001', 'hex')});
     var contact = {id: new Buffer('0003', 'hex')}; // 0000000000000011
-    var contacts = kBucket.closest(contact, 22);
+    var contacts = kBucket.closest(contact.id, 22);
     test.deepEqual(contacts[0].id, new Buffer('0001', 'hex')); // distance: 0000000000000010
     test.deepEqual(contacts[1].id, new Buffer('0103', 'hex')); // distance: 0000000100000000
     test.deepEqual(contacts[2].id, new Buffer('0102', 'hex')); // distance: 0000000100000010

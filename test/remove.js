@@ -9,7 +9,7 @@ test['throws TypeError if contact.id is not a Buffer'] = function (test) {
     var kBucket = new KBucket();
     var contact = {id: "foo"};
     test.throws(function () {
-        kBucket.remove(contact);
+        kBucket.remove(contact.id);
     }, TypeError);
     test.done();
 };
@@ -29,9 +29,9 @@ test['removing a contact should remove contact from nested buckets'] = function 
     kBucket.add({id: new Buffer('00' + iString, 'hex')});
     // console.log(require('util').inspect(kBucket, false, null));
     var contactToDelete = {id: new Buffer('8000', 'hex')};
-    test.equal(kBucket.high._indexOf(contactToDelete), 0);
-    kBucket.remove({id: new Buffer('8000', 'hex')});
-    test.equal(kBucket.high._indexOf(contactToDelete), -1);
+    test.equal(kBucket.high._indexOf(contactToDelete.id), 0);
+    kBucket.remove(new Buffer('8000', 'hex'));
+    test.equal(kBucket.high._indexOf(contactToDelete.id), -1);
     test.done();
 };
 
@@ -43,6 +43,6 @@ test['should generate "removed"'] = function (test) {
         test.deepEqual(removedContact, contact);
     });
     kBucket.add(contact);
-    kBucket.remove(contact);
+    kBucket.remove(contact.id);
     test.done();
 };

@@ -105,10 +105,10 @@ As more contacts are added to the "far" k-bucket and it reaches its capacity, it
   * [KBucket.distance(firstId, secondId)](#kbucketdistancefirstid-secondid)
   * [new KBucket(options)](#new-kbucketoptions)
   * [kBucket.add(contact)](#kbucketaddcontact)
-  * [kBucket.closest(contact, n)](#kbucketclosestcontact-n)
+  * [kBucket.closest(id, n)](#kbucketclosestid-n)
   * [kBucket.count()](#kbucketcount)
   * [kBucket.get(id)](#kbucketgetid)
-  * [kBucket.remove(contact)](#kbucketremovecontact)
+  * [kBucket.remove(id)](#kbucketremoveid)
   * [kBucket.toArray()](#kbuckettoarray)
   * [Event 'added'](#event-added)
   * [Event 'ping'](#event-ping)
@@ -144,15 +144,13 @@ Creates a new KBucket.
 
 Adds a `contact` to the k-bucket.
 
-#### kBucket.closest(contact, n)
+#### kBucket.closest(id, n)
 
-  * `contact`: _Object_ The contact object to find closest contacts to.
-    * `id`: _Buffer_ Contact node id.
-    * Any satellite data that is part of the `contact` object will not be altered, only `id` is used.
+  * `id`: _Buffer_ Contact node id.
   * `n`: _Integer_ The maximum number of closest contacts to return.
-  * Return: _Array_ Maximum of `n` closest contacts to the `contact`.
+  * Return: _Array_ Maximum of `n` closest contacts to the node id.
 
-Get the `n` closest contacts to the provided `contact`. "Closest" here means: closest according to the XOR metric of the `contact` node id.
+Get the `n` closest contacts to the provided node id. "Closest" here means: closest according to the XOR metric of the `contact` node id.
 
 #### kBucket.count()
 
@@ -167,11 +165,9 @@ Counts the total number of contacts in the tree.
 
 Retrieves the `contact`.
 
-#### kBucket.remove(contact)
+#### kBucket.remove(id)
 
-  * `contact`: _Object_ The contact object to remove.
-    * `id`: _Buffer_ contact node id.
-    * Any satellite data can be part of the `contact` object, only `id` is used
+  * `id`: _Buffer_ node id of contact object to remove.
   * Return: _Object_ The k-bucket itself.
 
 Removes the `contact`.
