@@ -21,7 +21,10 @@
     "Kirill Fomichev <fanatid@ya.ru>"
   ],
   "files": [
-    "index.js"
+    "index.js",
+    "benchmarks",
+    "scripts",
+    "test"
   ],
   "main": "./index.js",
   "repository": {
