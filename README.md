@@ -99,7 +99,7 @@ KBucket starts off as a single k-bucket with capacity of _k_. As contacts are ad
 
 As even more contacts are added to the "near" k-bucket, the "near" k-bucket will split again as it becomes full. However, this time it is split along the second bit of the contact node id. Again, the two newly created k-buckets are marked "near" and "far" and the "far" k-bucket is marked as _don't split_. Again, the contact nodes that existed in the old bucket are redistributed. This continues as long as nodes are being added to the "near" k-bucket, until the number of splits reaches the length of the local node id.
 
-As more contacts are added to the "far" k-bucket and it reaches its capacity, it does not split. Instead, the k-bucket emits a "ping" event (register a listener: `kBucket.on('ping', function (oldContacts, newContact) {...});` and includes an array of old contact nodes that it hasn't heard from in a while and requires you to confirm that those contact nodes still respond (literally respond to a PING RPC). If an old contact node still responds, it should be re-added (`kBucket.add(oldContact)`) back to the k-bucket. This puts the old contact on the "recently heard from" end of the list of nodes in the k-bucket. If the old contact does not respond, it should be removed (`kBucket.remove(oldContact)`) and the new contact being added now has room to be stored (`kBucket.add(newContact)`).
+As more contacts are added to the "far" k-bucket and it reaches its capacity, it does not split. Instead, the k-bucket emits a "ping" event (register a listener: `kBucket.on('ping', function (oldContacts, newContact) {...});` and includes an array of old contact nodes that it hasn't heard from in a while and requires you to confirm that those contact nodes still respond (literally respond to a PING RPC). If an old contact node still responds, it should be re-added (`kBucket.add(oldContact)`) back to the k-bucket. This puts the old contact on the "recently heard from" end of the list of nodes in the k-bucket. If the old contact does not respond, it should be removed (`kBucket.remove(oldContact.id)`) and the new contact being added now has room to be stored (`kBucket.add(newContact)`).
 
 **Public API**
   * [KBucket.distance(firstId, secondId)](#kbucketdistancefirstid-secondid)
@@ -160,17 +160,17 @@ Counts the total number of contacts in the tree.
 
 #### kBucket.get(id)
 
-  * `id`: _Buffer_ The ID of the `contact` to fetch
+  * `id`: _Buffer_ The ID of the `contact` to fetch.
   * Return: _Object_ The `contact` if available, otherwise null
 
 Retrieves the `contact`.
 
 #### kBucket.remove(id)
 
-  * `id`: _Buffer_ node id of contact object to remove.
+  * `id`: _Buffer_ The ID of the `contact` to remove.
   * Return: _Object_ The k-bucket itself.
 
-Removes the `contact`.
+Removes `contact` with the provided `id`.
 
 #### kBucket.toArray()
 

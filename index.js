@@ -153,7 +153,7 @@ KBucket.prototype.add = function add (contact) {
     return this._add(contact, 0);
 };
 
-// id: Buffer *require* node id
+// id: Buffer *required* node id
 // n: Integer *required* maximum number of closest contacts to return
 // bitIndex: Integer (Default: 0)
 // Return: Array of maximum of `n` closest contacts to the node id
@@ -187,7 +187,7 @@ KBucket.prototype._closest = function (id, n, bitIndex) {
     return contacts.slice(0, n);
 };
 
-// id: Buffer *require* node id
+// id: Buffer *required* node id
 // n: Integer *required* maximum number of closest contacts to return
 // Return: Array of maximum of `n` closest contacts to the node id
 KBucket.prototype.closest = function (id, n) {
@@ -254,7 +254,7 @@ KBucket.prototype._determineBucket = function (id, bitIndex) {
 // If this is a leaf, loop through the bucket contents and return the correct
 // contact if we have it or null if not. If this is an inner node, determine
 // which branch of the tree to traverse and repeat.
-// id: *required* a Buffer specifying the ID of the contact to fetch
+// id: Buffer *required* The ID of the contact to fetch.
 // bitIndex: the bitIndex to which bit to check in the Buffer for navigating
 //           the binary tree
 KBucket.prototype._get = function (id, bitIndex) {
@@ -280,7 +280,7 @@ KBucket.prototype._get = function (id, bitIndex) {
 // If this is a leaf, loop through the bucket contents and return the correct
 // contact if we have it or null if not. If this is an inner node, determine
 // which branch of the tree to traverse and repeat.
-// id: *required* a Buffer specifying the ID of the contact to fetch
+// id: Buffer *required* The ID of the contact to fetch.
 KBucket.prototype.get = function get (id) {
     if (!Buffer.isBuffer(id)) {
         throw new TypeError("id is not a Buffer");
@@ -288,8 +288,7 @@ KBucket.prototype.get = function get (id) {
     return this._get(id, 0);
 };
 
-// Returns the index of the ndoe id if it exists
-// **NOTE**: indexOf() does not compare vectorClock
+// Returns the index of the contact with the given id if it exists
 KBucket.prototype._indexOf = function indexOf (id) {
     var self = this;
     for (var i = 0; i < self.bucket.length; i++) {
@@ -298,7 +297,7 @@ KBucket.prototype._indexOf = function indexOf (id) {
     return -1;
 };
 
-// id: Buffer *require* node id of contact object to remove
+// id: Buffer *required* The ID of the contact to remove.
 // bitIndex: the bitIndex to which bit to check in the Buffer for navigating
 //           the binary tree
 KBucket.prototype._remove = function (id, bitIndex) {
@@ -324,7 +323,7 @@ KBucket.prototype._remove = function (id, bitIndex) {
     return self;
 };
 
-// id: Buffer *require* node id of contact object to remove
+// id: Buffer *required* he ID of the contact to remove.
 KBucket.prototype.remove = function remove (id) {
     if (!Buffer.isBuffer(id)) {
         throw new TypeError("id is not a Buffer");
