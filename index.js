@@ -288,6 +288,7 @@ KBucket.prototype.get = function get (id) {
     return this._get(id, 0);
 };
 
+// id: Buffer Contact node id.
 // Returns the index of the contact with the given id if it exists
 KBucket.prototype._indexOf = function indexOf (id) {
     var self = this;

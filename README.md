@@ -188,18 +188,14 @@ _**CAUTION: reserved for internal use**_
 
 Determines whether the `id` at the `bitIndex` is 0 or 1. If 0, returns -1, else 1.
 
-#### kBucket._indexOf(contact)
+#### kBucket._indexOf(id)
 
 _**CAUTION: reserved for internal use**_
 
-  * `contact`: _Object_ The contact object.
-    * `id`: _Buffer_ Contact node id.
-    * Any satellite data that is part of the `contact` object will not be altered, only `id` is used.
-  * Return: _Integer_ Index of `contact` if it exists, -1 otherwise.
+  * `id`: _Buffer_ Contact node id.
+  * Return: _Integer_ Index of `contact` with provided `id` if it exists, -1 otherwise.
 
-Returns the index of the `contact` if it exists, returns -1 otherwise.
-
-_NOTE: `kBucket._indexOf(contact)` does not use `arbiter` in the comparison.
+Returns the index of the `contact` with provided `id` if it exists, returns -1 otherwise.
 
 #### kBucket._splitAndAdd(contact, [bitIndex])
 
