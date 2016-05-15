@@ -2,28 +2,15 @@
   "name": "k-bucket",
   "version": "3.0.0",
   "description": "Kademlia DHT K-bucket implementation as a binary tree",
-  "scripts": {
-    "distance-benchmark": "node benchmarks/distance.js",
-    "test": "node scripts/test.js"
-  },
-  "main": "index.js",
-  "devDependencies": {
-    "nodeunit": "0.9.x"
-  },
-  "dependencies": {
-    "buffer-equals": "^1.0.3",
-    "inherits": "^2.0.1",
-    "randombytes": "^2.0.3"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:tristanls/k-bucket.git"
-  },
   "keywords": [
     "k-bucket",
     "kademlia",
     "dht"
   ],
+  "bugs": {
+    "url": "https://github.com/tristanls/k-bucket/issues"
+  },
+  "license": "MIT",
   "contributors": [
     "Tristan Slominski <tristan.slominski@gmail.com>",
     "Mike de Boer <info@mikedeboer.nl>",
@@ -33,5 +20,27 @@
     "Fabien O'Carroll <fabien@allou.is>",
     "Kirill Fomichev <fanatid@ya.ru>"
   ],
-  "license": "MIT"
+  "files": [
+    "index.js"
+  ],
+  "main": "./index.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:tristanls/k-bucket.git"
+  },
+  "scripts": {
+    "benchmark:distance": "node benchmarks/distance.js",
+    "lint": "standard",
+    "test": "npm run lint && npm run unit",
+    "unit": "node scripts/test.js"
+  },
+  "dependencies": {
+    "buffer-equals": "^1.0.3",
+    "inherits": "^2.0.1",
+    "randombytes": "^2.0.3"
+  },
+  "devDependencies": {
+    "nodeunit": "0.9.x",
+    "standard": "^7.0.1"
+  }
 }
