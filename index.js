@@ -119,7 +119,7 @@ KBucket.prototype._add = function (contact, bitIndex) {
     }
 
     // check if the contact already exists
-    var index = self._indexOf(contact);
+    var index = self._indexOf(contact.id);
     if (index >= 0) {
         self._update(contact, index);
         return self;
@@ -153,26 +153,25 @@ KBucket.prototype.add = function add (contact) {
     return this._add(contact, 0);
 };
 
-// contact: Object *required* contact object
-//   id: Buffer *require* node id
+// id: Buffer *require* node id
 // n: Integer *required* maximum number of closest contacts to return
 // bitIndex: Integer (Default: 0)
-// Return: Array of maximum of `n` closest contacts to the `contact`
-KBucket.prototype._closest = function (contact, n, bitIndex) {
+// Return: Array of maximum of `n` closest contacts to the node id
+KBucket.prototype._closest = function (id, n, bitIndex) {
     var self = this;
 
     var contacts;
 
     if (!self.bucket) {
-        if (self._determineBucket(contact.id, bitIndex++) < 0) {
-            contacts = self.low._closest(contact, n, bitIndex);
+        if (self._determineBucket(id, bitIndex++) < 0) {
+            contacts = self.low._closest(id, n, bitIndex);
             if (contacts.length < n) {
-                contacts = contacts.concat(self.high._closest(contact, n, bitIndex));
+                contacts = contacts.concat(self.high._closest(id, n, bitIndex));
             }
         } else {
-            contacts = self.high._closest(contact, n, bitIndex);
+            contacts = self.high._closest(id, n, bitIndex);
             if (contacts.length < n) {
-                contacts = contacts.concat(self.low._closest(contact, n, bitIndex));
+                contacts = contacts.concat(self.low._closest(id, n, bitIndex));
             }
         }
         return contacts.slice(0, n);
@@ -180,7 +179,7 @@ KBucket.prototype._closest = function (contact, n, bitIndex) {
 
     contacts = self.bucket.slice();
     contacts.forEach(function (storedContact) {
-        storedContact.distance = KBucket.distance(storedContact.id, contact.id);
+        storedContact.distance = KBucket.distance(storedContact.id, id);
     });
 
     contacts.sort(function (a, b) {return a.distance - b.distance;});
@@ -188,15 +187,14 @@ KBucket.prototype._closest = function (contact, n, bitIndex) {
     return contacts.slice(0, n);
 };
 
-// contact: Object *required* contact object
-//   id: Buffer *require* node id
+// id: Buffer *require* node id
 // n: Integer *required* maximum number of closest contacts to return
-// Return: Array of maximum of `n` closest contacts to the `contact`
-KBucket.prototype.closest = function (contact, n) {
-    if (!Buffer.isBuffer(contact.id)) {
-        throw new TypeError("contact.id is not a Buffer");
+// Return: Array of maximum of `n` closest contacts to the node id
+KBucket.prototype.closest = function (id, n) {
+    if (!Buffer.isBuffer(id)) {
+        throw new TypeError("id is not a Buffer");
     }
-    return this._closest(contact, n, 0);
+    return this._closest(id, n, 0);
 };
 
 // Counts the number of contacts recursively.
@@ -270,7 +268,7 @@ KBucket.prototype._get = function (id, bitIndex) {
         }
     }
 
-    var index = self._indexOf({id: id}); // index of uses contact.id for matching
+    var index = self._indexOf(id); // index of uses contact id for matching
     if (index < 0) {
         return null; // contact not found
     }
@@ -290,20 +288,20 @@ KBucket.prototype.get = function get (id) {
     return this._get(id, 0);
 };
 
-// Returns the index of the contact if it exists
+// Returns the index of the ndoe id if it exists
 // **NOTE**: indexOf() does not compare vectorClock
-KBucket.prototype._indexOf = function indexOf (contact) {
+KBucket.prototype._indexOf = function indexOf (id) {
     var self = this;
     for (var i = 0; i < self.bucket.length; i++) {
-        if (bufferEquals(self.bucket[i].id, contact.id)) return i;
+        if (bufferEquals(self.bucket[i].id, id)) return i;
     }
     return -1;
 };
 
-// contact: *required* the contact object to remove
+// id: Buffer *require* node id of contact object to remove
 // bitIndex: the bitIndex to which bit to check in the Buffer for navigating
 //           the binary tree
-KBucket.prototype._remove = function (contact, bitIndex) {
+KBucket.prototype._remove = function (id, bitIndex) {
     var self = this;
 
     // first check whether we are an inner node or a leaf (with bucket contents)
@@ -311,27 +309,27 @@ KBucket.prototype._remove = function (contact, bitIndex) {
         // this is not a leaf node but an inner node with 'low' and 'high'
         // branches; we will check the appropriate bit of the identifier and
         // delegate to the appropriate node for further processing
-        if (self._determineBucket(contact.id, bitIndex++) < 0) {
-            return self.low._remove(contact, bitIndex);
+        if (self._determineBucket(id, bitIndex++) < 0) {
+            return self.low._remove(id, bitIndex);
         } else {
-            return self.high._remove(contact, bitIndex);
+            return self.high._remove(id, bitIndex);
         }
     }
 
-    var index = self._indexOf(contact);
+    var index = self._indexOf(id);
     if (index >= 0) {
-        self.bucket.splice(index, 1);
+        var contact = self.bucket.splice(index, 1)[0];
         self.emit('removed', contact);
     }
     return self;
 };
 
-// contact: *required* the contact object to remove
-KBucket.prototype.remove = function remove (contact) {
-    if (!Buffer.isBuffer(contact.id)) {
-        throw new TypeError("contact.id is not a Buffer");
+// id: Buffer *require* node id of contact object to remove
+KBucket.prototype.remove = function remove (id) {
+    if (!Buffer.isBuffer(id)) {
+        throw new TypeError("id is not a Buffer");
     }
-    return this._remove(contact, 0);
+    return this._remove(id, 0);
 };
 
 // Splits the bucket, redistributes contacts to the new buckets, and marks the
