@@ -79,7 +79,7 @@ test['split buckets contain all added contacts'] = function (test) {
 
 test['when splitting buckets the "far away" bucket should be marked to prevent splitting "far away" bucket'] = function (test) {
   test.expect(5)
-  var kBucket = new KBucket({ localNodeId: new Buffer( 0x00 ) })
+  var kBucket = new KBucket({ localNodeId: new Buffer([ 0x00 ]) })
   for (var i = 0; i < kBucket.numberOfNodesPerKBucket + 1; ++i) {
     kBucket.add({ id: new Buffer([ i ]) })
   }

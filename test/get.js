@@ -44,7 +44,6 @@ test['get retrieves most recently added contact if same id'] = function (test) {
 
 test['get retrieves contact from nested leaf node'] = function (test) {
   test.expect(1)
-  var iString
   var kBucket = new KBucket({localNodeId: new Buffer([ 0x00, 0x00 ])})
   for (var i = 0; i < kBucket.numberOfNodesPerKBucket; ++i) {
     kBucket.add({ id: new Buffer([ 0x80, i ]) }) // make sure all go into "far away" bucket
