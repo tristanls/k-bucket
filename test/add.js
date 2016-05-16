@@ -76,3 +76,20 @@ test['should generate event "added" once'] = function (test) {
   kBucket.add(contact)
   test.done()
 }
+
+test['should generate event "added" when adding to a split bucket'] = function (test) {
+  test.expect(2)
+  var kBucket = new KBucket({
+    localNodeId: new Buffer('') // need non-random localNodeId for deterministic splits
+  })
+  for (var i = 0; i < kBucket.numberOfNodesPerKBucket + 1; ++i) {
+    kBucket.add({ id: new Buffer('' + i) })
+  }
+  test.ok(!kBucket.bucket)
+  var contact = { id: new Buffer('a') }
+  kBucket.on('added', function (newContact) {
+    test.deepEqual(newContact, contact)
+  })
+  kBucket.add(contact)
+  test.done()
+}

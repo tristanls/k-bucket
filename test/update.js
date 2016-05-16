@@ -65,3 +65,23 @@ test['should generate "updated"'] = function (test) {
   kBucket.add(contact2)
   test.done()
 }
+
+test['should generate event "updated" when updating a split bucket'] = function (test) {
+  test.expect(3)
+  var kBucket = new KBucket({
+    localNodeId: new Buffer('') // need non-random localNodeId for deterministic splits
+  })
+  for (var i = 0; i < kBucket.numberOfNodesPerKBucket + 1; ++i) {
+    kBucket.add({ id: new Buffer('' + i) })
+  }
+  test.ok(!kBucket.bucket)
+  var contact1 = { id: new Buffer('a'), vectorClock: 1 }
+  var contact2 = { id: new Buffer('a'), vectorClock: 2 }
+  kBucket.on('updated', function (oldContact, newContact) {
+    test.deepEqual(oldContact, contact1)
+    test.deepEqual(newContact, contact2)
+  })
+  kBucket.add(contact1)
+  kBucket.add(contact2)
+  test.done()
+}

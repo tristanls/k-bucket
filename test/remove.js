@@ -38,3 +38,21 @@ test['should generate "removed"'] = function (test) {
   kBucket.remove(contact.id)
   test.done()
 }
+
+test['should generate event "removed" when removing from a split bucket'] = function (test) {
+  test.expect(2)
+  var kBucket = new KBucket({
+    localNodeId: new Buffer('') // need non-random localNodeId for deterministic splits
+  })
+  for (var i = 0; i < kBucket.numberOfNodesPerKBucket + 1; ++i) {
+    kBucket.add({ id: new Buffer('' + i) })
+  }
+  test.ok(!kBucket.bucket)
+  var contact = { id: new Buffer('a') }
+  kBucket.on('removed', function (removedContact) {
+    test.deepEqual(removedContact, contact)
+  })
+  kBucket.add(contact)
+  kBucket.remove(contact.id)
+  test.done()
+}
