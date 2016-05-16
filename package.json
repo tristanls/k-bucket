@@ -20,12 +20,6 @@
     "Fabien O'Carroll <fabien@allou.is>",
     "Kirill Fomichev <fanatid@ya.ru>"
   ],
-  "files": [
-    "index.js",
-    "benchmarks",
-    "scripts",
-    "test"
-  ],
   "main": "./index.js",
   "repository": {
     "type": "git",
