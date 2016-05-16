@@ -115,7 +115,7 @@ KBucket.prototype._add = function (contact, bitIndex) {
 
   if (this.bucket.length < this.numberOfNodesPerKBucket) {
     this.bucket.push(contact)
-    this.emit('added', contact)
+    this.root.emit('added', contact)
     return this
   }
 
@@ -277,7 +277,7 @@ KBucket.prototype._remove = function (id, bitIndex) {
   var index = this._indexOf(id)
   if (index >= 0) {
     var contact = this.bucket.splice(index, 1)[0]
-    this.emit('removed', contact)
+    this.root.emit('removed', contact)
   }
 
   return this
@@ -374,5 +374,5 @@ KBucket.prototype._update = function (contact, index) {
 
   this.bucket.splice(index, 1) // remove old contact
   this.bucket.push(selection) // add more recent contact version
-  this.emit('updated', incumbent, selection)
+  this.root.emit('updated', incumbent, selection)
 }
