@@ -27,10 +27,10 @@
   },
   "scripts": {
     "benchmark:distance": "node benchmarks/distance.js",
-    "coverage": "nyc node scripts/test.js",
+    "coverage": "nyc tape test/*.js",
     "lint": "standard",
     "test": "npm run lint && npm run unit",
-    "unit": "node scripts/test.js"
+    "unit": "tape test/*.js"
   },
   "dependencies": {
     "buffer-equals": "^1.0.3",
@@ -38,8 +38,8 @@
     "randombytes": "^2.0.3"
   },
   "devDependencies": {
-    "nodeunit": "0.9.x",
     "nyc": "^6.4.4",
-    "standard": "^7.0.1"
+    "standard": "^7.0.1",
+    "tape": "^4.5.1"
   }
 }

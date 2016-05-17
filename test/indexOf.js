@@ -1,20 +1,17 @@
 'use strict'
-var KBucket = require('../index')
+var test = require('tape')
+var KBucket = require('../')
 
-var test = module.exports = {}
-
-test['indexOf returns a contact with id that contains the same byte sequence as the test contact'] = function (test) {
-  test.expect(1)
+test('indexOf returns a contact with id that contains the same byte sequence as the test contact', function (t) {
   var kBucket = new KBucket()
   kBucket.add({ id: new Buffer('a') })
-  test.equal(kBucket._indexOf(new Buffer('a')), 0)
-  test.done()
-}
+  t.same(kBucket._indexOf(new Buffer('a')), 0)
+  t.end()
+})
 
-test['indexOf returns -1 if contact is not found'] = function (test) {
-  test.expect(1)
+test('indexOf returns -1 if contact is not found', function (t) {
   var kBucket = new KBucket()
   kBucket.add({ id: new Buffer('a') })
-  test.equal(kBucket._indexOf(new Buffer('b')), -1)
-  test.done()
-}
+  t.same(kBucket._indexOf(new Buffer('b')), -1)
+  t.end()
+})
