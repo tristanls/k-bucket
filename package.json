@@ -27,6 +27,7 @@
   },
   "scripts": {
     "benchmark:distance": "node benchmarks/distance.js",
+    "coverage": "nyc node scripts/test.js",
     "lint": "standard",
     "test": "npm run lint && npm run unit",
     "unit": "node scripts/test.js"
@@ -38,6 +39,7 @@
   },
   "devDependencies": {
     "nodeunit": "0.9.x",
+    "nyc": "^6.4.4",
     "standard": "^7.0.1"
   }
 }
