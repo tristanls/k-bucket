@@ -1,5 +1,5 @@
 'use strict'
-var bufferEqual = require('buffer-equal')
+var bufferEquals = require('buffer-equals')
 var test = require('tape')
 var KBucket = require('../')
 
@@ -38,7 +38,7 @@ test('more recent vectorClock results in contact update and contact being marked
   kBucket.add(contact)
   kBucket.add({ id: new Buffer('b') })
   kBucket._update({ id: new Buffer('a'), newer: 'property', vectorClock: 4 }, 0)
-  t.true(bufferEqual(kBucket.bucket[1].id, contact.id))
+  t.true(bufferEquals(kBucket.bucket[1].id, contact.id))
   t.same(kBucket.bucket[1].vectorClock, 4)
   t.same(kBucket.bucket[1].old, undefined)
   t.same(kBucket.bucket[1].newer, 'property')

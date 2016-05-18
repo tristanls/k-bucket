@@ -1,5 +1,5 @@
 'use strict'
-var bufferEqual = require('buffer-equal')
+var bufferEquals = require('buffer-equals')
 var test = require('tape')
 var KBucket = require('../')
 
@@ -21,7 +21,7 @@ test('get retrieves a contact that was added', function (t) {
   var kBucket = new KBucket()
   var contact = { id: new Buffer('a') }
   kBucket.add(contact)
-  t.true(bufferEqual(kBucket.get(new Buffer('a')).id, new Buffer('a')))
+  t.true(bufferEquals(kBucket.get(new Buffer('a')).id, new Buffer('a')))
   t.end()
 })
 
@@ -31,7 +31,7 @@ test('get retrieves most recently added contact if same id', function (t) {
   var contact2 = { id: new Buffer('a'), foo: 'bar', vectorClock: 1 }
   kBucket.add(contact)
   kBucket.add(contact2)
-  t.true(bufferEqual(kBucket.get(new Buffer('a')).id, new Buffer('a')))
+  t.true(bufferEquals(kBucket.get(new Buffer('a')).id, new Buffer('a')))
   t.same(kBucket.get(new Buffer('a')).foo, 'bar')
   t.same(kBucket.get(new Buffer('a')).bar, undefined)
   t.end()
