@@ -1,45 +1,39 @@
 'use strict'
 var bufferEqual = require('buffer-equal')
 var EventEmitter = require('events').EventEmitter
-var KBucket = require('../index')
+var test = require('tape')
+var KBucket = require('../')
 
-var test = module.exports = {}
-
-test['localNodeId should be a random SHA-1 if not provided'] = function (test) {
-  test.expect(2)
+test('localNodeId should be a random SHA-1 if not provided', function (t) {
   var kBucket = new KBucket()
-  test.ok(kBucket.localNodeId instanceof Buffer)
-  test.equal(kBucket.localNodeId.length, 20) // SHA-1 is 160 bits (20 bytes)
-  test.done()
-}
+  t.true(kBucket.localNodeId instanceof Buffer)
+  t.same(kBucket.localNodeId.length, 20) // SHA-1 is 160 bits (20 bytes)
+  t.end()
+})
 
-test['localNodeId is a Buffer populated from options if options.localNodeId Buffer is provided'] = function (test) {
+test('localNodeId is a Buffer populated from options if options.localNodeId Buffer is provided', function (t) {
   var localNodeId = new Buffer('some length')
-  test.expect(2)
   var kBucket = new KBucket({localNodeId: localNodeId})
-  test.ok(kBucket.localNodeId instanceof Buffer)
-  test.ok(bufferEqual(kBucket.localNodeId, localNodeId))
-  test.done()
-}
+  t.true(kBucket.localNodeId instanceof Buffer)
+  t.true(bufferEqual(kBucket.localNodeId, localNodeId))
+  t.end()
+})
 
-test['throws exception if options.localNodeId is a String'] = function (test) {
-  test.expect(1)
-  test.throws(function () {
+test('throws exception if options.localNodeId is a String', function (t) {
+  t.throws(function () {
     return new KBucket({ localNodeId: 'some identifier' })
-  }, Error)
-  test.done()
-}
+  })
+  t.end()
+})
 
-test["root is 'self' if not provided"] = function (test) {
-  test.expect(1)
+test('root is \'self\' if not provided', function (t) {
   var kBucket = new KBucket()
-  test.strictEqual(kBucket.root, kBucket)
-  test.done()
-}
+  t.same(kBucket.root, kBucket)
+  t.end()
+})
 
-test['inherits from EventEmitter'] = function (test) {
-  test.expect(1)
+test('inherits from EventEmitter', function (t) {
   var kBucket = new KBucket()
-  test.ok(kBucket instanceof EventEmitter)
-  test.done()
-}
+  t.true(kBucket instanceof EventEmitter)
+  t.end()
+})

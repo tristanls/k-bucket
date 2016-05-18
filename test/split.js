@@ -1,45 +1,41 @@
 'use strict'
-var KBucket = require('../index')
+var test = require('tape')
+var KBucket = require('../')
 
-var test = module.exports = {}
-
-test['adding a contact does not split K-bucket'] = function (test) {
-  test.expect(3)
+test('adding a contact does not split K-bucket', function (t) {
   var kBucket = new KBucket()
   kBucket.add({ id: new Buffer('a') })
-  test.ok(!kBucket.low)
-  test.ok(!kBucket.high)
-  test.ok(kBucket.bucket)
-  test.done()
-}
+  t.false(kBucket.low)
+  t.false(kBucket.high)
+  t.true(kBucket.bucket)
+  t.end()
+})
 
-test['adding maximum number of contacts (per K-bucket) [20] into K-bucket does not split K-bucket'] = function (test) {
-  test.expect(3)
+test('adding maximum number of contacts (per K-bucket) [20] into K-bucket does not split K-bucket', function (t) {
   var kBucket = new KBucket()
   for (var i = 0; i < kBucket.numberOfNodesPerKBucket; ++i) {
     kBucket.add({ id: new Buffer('' + i) })
   }
-  test.ok(!kBucket.low)
-  test.ok(!kBucket.high)
-  test.ok(kBucket.bucket)
-  test.done()
-}
+  t.false(kBucket.low)
+  t.false(kBucket.high)
+  t.true(kBucket.bucket)
+  t.end()
+})
 
-test['adding maximum number of contacts (per K-bucket) + 1 [21] into K-bucket splits the K-bucket'] = function (test) {
-  test.expect(3)
+test('adding maximum number of contacts (per K-bucket) + 1 [21] into K-bucket splits the K-bucket', function (t) {
   var kBucket = new KBucket()
   for (var i = 0; i < kBucket.numberOfNodesPerKBucket + 1; ++i) {
     kBucket.add({ id: new Buffer('' + i) })
   }
-  test.ok(kBucket.low instanceof KBucket)
-  test.ok(kBucket.high instanceof KBucket)
-  test.ok(!kBucket.bucket)
-  test.done()
-}
+  t.true(kBucket.low instanceof KBucket)
+  t.true(kBucket.high instanceof KBucket)
+  t.false(kBucket.bucket)
+  t.end()
+})
 
-test['split buckets inherit options from parent bucket'] = function (test) {
+test('split buckets inherit options from parent bucket', function (t) {
   var OPTIONS = ['arbiter', 'localNodeId', 'root', 'numberOfNodesPerKBucket', 'numberOfNodesToPing']
-  test.expect(2 * OPTIONS.length)
+  t.plan(OPTIONS.length * 2)
   var kBucket = new KBucket()
   var _options = {}
   OPTIONS.forEach(function (option) { _options[option] = kBucket[option] })
@@ -47,15 +43,15 @@ test['split buckets inherit options from parent bucket'] = function (test) {
     kBucket.add({ id: new Buffer('' + i) })
   }
   OPTIONS.forEach(function (option) {
-    test.strictEqual(kBucket.low[option], _options[option])
-    test.strictEqual(kBucket.high[option], _options[option])
+    t.same(kBucket.low[option], _options[option])
+    t.same(kBucket.high[option], _options[option])
   })
-  test.done()
-}
+  t.end()
+})
 
-test['split buckets contain all added contacts'] = function (test) {
-  test.expect(20 /* numberOfNodesPerKBucket */ + 2)
-  var kBucket = new KBucket({localNodeId: new Buffer([ 0x00 ])})
+test('split buckets contain all added contacts', function (t) {
+  t.plan(20 /* numberOfNodesPerKBucket */ + 2)
+  var kBucket = new KBucket({ localNodeId: new Buffer([ 0x00 ]) })
   var foundContact = {}
   for (var i = 0; i < kBucket.numberOfNodesPerKBucket + 1; ++i) {
     kBucket.add({ id: new Buffer([ i ]) })
@@ -72,13 +68,13 @@ test['split buckets contain all added contacts'] = function (test) {
     }
   }
   traverse(kBucket)
-  Object.keys(foundContact).forEach(function (key) { test.ok(foundContact[key], key) })
-  test.ok(!kBucket.bucket)
-  test.done()
-}
+  Object.keys(foundContact).forEach(function (key) { t.true(foundContact[key], key) })
+  t.false(kBucket.bucket)
+  t.end()
+})
 
-test['when splitting buckets the "far away" bucket should be marked to prevent splitting "far away" bucket'] = function (test) {
-  test.expect(5)
+test('when splitting buckets the "far away" bucket should be marked to prevent splitting "far away" bucket', function (t) {
+  t.plan(5)
   var kBucket = new KBucket({ localNodeId: new Buffer([ 0x00 ]) })
   for (var i = 0; i < kBucket.numberOfNodesPerKBucket + 1; ++i) {
     kBucket.add({ id: new Buffer([ i ]) })
@@ -87,16 +83,16 @@ test['when splitting buckets the "far away" bucket should be marked to prevent s
   // in the low bucket, and put 0x10 through 0x14 in high bucket
   // since localNodeId is 0x00, we expect every high bucket to be "far" and
   // therefore marked as "dontSplit = true"
-  // there will be one "low" bucket and four "high" buckets (test.expect(5))
+  // there will be one "low" bucket and four "high" buckets (t.expect(5))
   var traverse = function (node, dontSplit) {
     if (!node.bucket) {
       traverse(node.low, false)
       traverse(node.high, true)
     } else {
-      if (dontSplit) test.ok(node.dontSplit)
-      else test.ok(!node.dontSplit)
+      if (dontSplit) t.true(node.dontSplit)
+      else t.false(node.dontSplit)
     }
   }
   traverse(kBucket)
-  test.done()
-}
+  t.end()
+})

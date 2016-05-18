@@ -1,20 +1,17 @@
 'use strict'
-var KBucket = require('../index')
+var test = require('tape')
+var KBucket = require('../')
 
-var test = module.exports = {}
-
-test['throws TypeError if contact.id is not a Buffer'] = function (test) {
-  test.expect(1)
+test('throws TypeError if contact.id is not a Buffer', function (t) {
   var kBucket = new KBucket()
   var contact = { id: 'foo' }
-  test.throws(function () {
+  t.throws(function () {
     kBucket.remove(contact.id)
-  }, TypeError)
-  test.done()
-}
+  })
+  t.end()
+})
 
-test['removing a contact should remove contact from nested buckets'] = function (test) {
-  test.expect(2)
+test('removing a contact should remove contact from nested buckets', function (t) {
   var kBucket = new KBucket({ localNodeId: new Buffer([ 0x00, 0x00 ]) })
   for (var i = 0; i < kBucket.numberOfNodesPerKBucket; ++i) {
     kBucket.add({ id: new Buffer([ 0x80, i ]) }) // make sure all go into "far away" bucket
@@ -23,36 +20,38 @@ test['removing a contact should remove contact from nested buckets'] = function 
   kBucket.add({ id: new Buffer([ 0x00, i ]) })
   // console.log(require('util').inspect(kBucket, false, null))
   var contactToDelete = { id: new Buffer([ 0x80, 0x00 ]) }
-  test.equal(kBucket.high._indexOf(contactToDelete.id), 0)
+  t.same(kBucket.high._indexOf(contactToDelete.id), 0)
   kBucket.remove(new Buffer([ 0x80, 0x00 ]))
-  test.equal(kBucket.high._indexOf(contactToDelete.id), -1)
-  test.done()
-}
+  t.same(kBucket.high._indexOf(contactToDelete.id), -1)
+  t.end()
+})
 
-test['should generate "removed"'] = function (test) {
-  test.expect(1)
+test('should generate "removed"', function (t) {
+  t.plan(1)
   var kBucket = new KBucket()
   var contact = { id: new Buffer('a') }
-  kBucket.on('removed', function (removedContact) { test.deepEqual(removedContact, contact) })
+  kBucket.on('removed', function (removedContact) {
+    t.same(removedContact, contact)
+    t.end()
+  })
   kBucket.add(contact)
   kBucket.remove(contact.id)
-  test.done()
-}
+})
 
-test['should generate event "removed" when removing from a split bucket'] = function (test) {
-  test.expect(2)
+test('should generate event "removed" when removing from a split bucket', function (t) {
+  t.plan(2)
   var kBucket = new KBucket({
     localNodeId: new Buffer('') // need non-random localNodeId for deterministic splits
   })
   for (var i = 0; i < kBucket.numberOfNodesPerKBucket + 1; ++i) {
     kBucket.add({ id: new Buffer('' + i) })
   }
-  test.ok(!kBucket.bucket)
+  t.false(kBucket.bucket)
   var contact = { id: new Buffer('a') }
   kBucket.on('removed', function (removedContact) {
-    test.deepEqual(removedContact, contact)
+    t.same(removedContact, contact)
+    t.end()
   })
   kBucket.add(contact)
   kBucket.remove(contact.id)
-  test.done()
-}
+})
