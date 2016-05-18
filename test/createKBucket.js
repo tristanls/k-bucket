@@ -13,7 +13,7 @@ test('localNodeId should be a random SHA-1 if not provided', function (t) {
 
 test('localNodeId is a Buffer populated from options if options.localNodeId Buffer is provided', function (t) {
   var localNodeId = new Buffer('some length')
-  var kBucket = new KBucket({localNodeId: localNodeId})
+  var kBucket = new KBucket({ localNodeId: localNodeId })
   t.true(kBucket.localNodeId instanceof Buffer)
   t.true(bufferEquals(kBucket.localNodeId, localNodeId))
   t.end()
@@ -26,9 +26,9 @@ test('throws exception if options.localNodeId is a String', function (t) {
   t.end()
 })
 
-test('root is \'self\' if not provided', function (t) {
+test('check root node', function (t) {
   var kBucket = new KBucket()
-  t.same(kBucket.root, kBucket)
+  t.same(kBucket.root, { contacts: [], dontSplit: false, left: null, right: null })
   t.end()
 })
 

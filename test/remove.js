@@ -20,9 +20,9 @@ test('removing a contact should remove contact from nested buckets', function (t
   kBucket.add({ id: new Buffer([ 0x00, i ]) })
   // console.log(require('util').inspect(kBucket, false, null))
   var contactToDelete = { id: new Buffer([ 0x80, 0x00 ]) }
-  t.same(kBucket.high._indexOf(contactToDelete.id), 0)
+  t.same(kBucket._indexOf(kBucket.root.right, contactToDelete.id), 0)
   kBucket.remove(new Buffer([ 0x80, 0x00 ]))
-  t.same(kBucket.high._indexOf(contactToDelete.id), -1)
+  t.same(kBucket._indexOf(kBucket.root.right, contactToDelete.id), -1)
   t.end()
 })
 
