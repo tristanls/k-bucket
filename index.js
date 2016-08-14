@@ -35,6 +35,14 @@ var inherits = require('inherits')
 
 module.exports = KBucket
 
+function defaultArbiter (incumbent, candidate) {
+  return incumbent.vectorClock > candidate.vectorClock ? incumbent : candidate
+}
+
+function createNode () {
+  return { contacts: [], dontSplit: false, left: null, right: null }
+}
+
 /*
   * `options`:
     * `arbiter`: _Function_ _(Default: vectorClock arbiter)_
@@ -51,32 +59,19 @@ module.exports = KBucket
         ping when a bucket that should not be split becomes full. KBucket will
         emit a `ping` event that contains `numberOfNodesToPing` nodes that have
         not been contacted the longest.
-    * `root`: _Object_ _**CAUTION: reserved for internal use**_ Provides a
-        reference to the root of the tree data structure as the k-bucket splits
-        when new contacts are added.
 */
 function KBucket (options) {
   EventEmitter.call(this)
   options = options || {}
 
-  // use an arbiter from options or vectorClock arbiter by default
-  this.arbiter = options.arbiter || function arbiter (incumbent, candidate) {
-    return incumbent.vectorClock > candidate.vectorClock ? incumbent : candidate
-  }
-
-  // the bucket array has least-recently-contacted at the "front/left" side
-  // and the most-recently-contaced at the "back/right" side
-  this.bucket = []
   this.localNodeId = options.localNodeId || randomBytes(20)
   if (!Buffer.isBuffer(this.localNodeId)) throw new TypeError('localNodeId is not a Buffer')
   this.numberOfNodesPerKBucket = options.numberOfNodesPerKBucket || 20
   this.numberOfNodesToPing = options.numberOfNodesToPing || 3
-  this.root = options.root || this
+  // use an arbiter from options or vectorClock arbiter by default
+  this.arbiter = options.arbiter || defaultArbiter
 
-  // V8 hints
-  this.dontSplit = null
-  this.low = null
-  this.high = null
+  this.root = createNode()
 }
 
 inherits(KBucket, EventEmitter)
@@ -91,79 +86,44 @@ KBucket.distance = function (firstId, secondId) {
 }
 
 // contact: *required* the contact object to add
-// bitIndex: the bitIndex to which bit to check in the Buffer for navigating
-//           the binary tree
-KBucket.prototype._add = function (contact, bitIndex) {
-  // first check whether we are an inner node or a leaf (with bucket contents)
-  if (this.bucket === null) {
+KBucket.prototype.add = function (contact) {
+  if (!Buffer.isBuffer(contact.id)) throw new TypeError('contact.id is not a Buffer')
+  var bitIndex = 0
+
+  var node = this.root
+  while (node.contacts === null) {
     // this is not a leaf node but an inner node with 'low' and 'high'
     // branches; we will check the appropriate bit of the identifier and
     // delegate to the appropriate node for further processing
-    if (this._determineBucket(contact.id, bitIndex++) < 0) {
-      return this.low._add(contact, bitIndex)
-    } else {
-      return this.high._add(contact, bitIndex)
-    }
+    node = this._determineNode(node, contact.id, bitIndex++)
   }
 
   // check if the contact already exists
-  var index = this._indexOf(contact.id)
+  var index = this._indexOf(node, contact.id)
   if (index >= 0) {
-    this._update(contact, index)
+    this._update(node, index, contact)
     return this
   }
 
-  if (this.bucket.length < this.numberOfNodesPerKBucket) {
-    this.bucket.push(contact)
-    this.root.emit('added', contact)
+  if (node.contacts.length < this.numberOfNodesPerKBucket) {
+    node.contacts.push(contact)
+    this.emit('added', contact)
     return this
   }
 
   // the bucket is full
-  if (this.dontSplit) {
+  if (node.dontSplit) {
     // we are not allowed to split the bucket
     // we need to ping the first this.numberOfNodesToPing
     // in order to determine if they are alive
     // only if one of the pinged nodes does not respond, can the new contact
     // be added (this prevents DoS flodding with new invalid contacts)
-    this.root.emit('ping', this.bucket.slice(0, this.numberOfNodesToPing), contact)
+    this.emit('ping', node.contacts.slice(0, this.numberOfNodesToPing), contact)
     return this
   }
 
-  return this._splitAndAdd(contact, bitIndex)
-}
-
-// contact: *required* the contact object to add
-KBucket.prototype.add = function (contact) {
-  if (!Buffer.isBuffer(contact.id)) throw new TypeError('contact.id is not a Buffer')
-  return this._add(contact, 0)
-}
-
-// id: Buffer *required* node id
-// n: Integer *required* maximum number of closest contacts to return
-// bitIndex: Integer (Default: 0)
-// Return: Array of maximum of `n` closest contacts to the node id
-KBucket.prototype._closest = function (id, n, bitIndex) {
-  if (this.bucket === null) {
-    var contacts
-    if (this._determineBucket(id, bitIndex++) < 0) {
-      contacts = this.low._closest(id, n, bitIndex)
-      if (contacts.length < n) contacts = contacts.concat(this.high._closest(id, n, bitIndex))
-    } else {
-      contacts = this.high._closest(id, n, bitIndex)
-      if (contacts.length < n) contacts = contacts.concat(this.low._closest(id, n, bitIndex))
-    }
-
-    return contacts.slice(0, n)
-  }
-
-  return this.bucket
-    .map(function (storedContact) {
-      storedContact.distance = KBucket.distance(storedContact.id, id)
-      return storedContact
-    })
-    .sort(function (a, b) { return a.distance - b.distance })
-    .slice(0, n)
+  this._split(node, bitIndex)
+  return this.add(contact)
 }
 
 // id: Buffer *required* node id
@@ -171,23 +131,64 @@ KBucket.prototype._closest = function (id, n, bitIndex) {
 // Return: Array of maximum of `n` closest contacts to the node id
 KBucket.prototype.closest = function (id, n) {
   if (!Buffer.isBuffer(id)) throw new TypeError('id is not a Buffer')
-  return this._closest(id, n, 0)
+  var contacts = []
+
+  function sort (contacts) {
+    return contacts.slice().sort(function (a, b) {
+      return KBucket.distance(a.id, id) - KBucket.distance(b.id, id)
+    })
+  }
+
+  for (var nodes = [ this.root ], bitIndex = 0; nodes.length > 0 && contacts.length < n;) {
+    var node = nodes.pop()
+    if (node.contacts === null) {
+      var detNode = this._determineNode(node, id, bitIndex++)
+      nodes.push(node.left === detNode ? node.right : node.left)
+      nodes.push(detNode)
+    } else {
+      contacts = contacts.concat(sort(node.contacts)).slice(0, n)
+    }
+  }
+
+  return contacts
+
+  /*
+  function sort (contacts) {
+    return contacts.slice().sort(function (a, b) {
+      return KBucket.distance(a, id) - KBucket.distance(b, id)
+    })
+  }
+
+  for (var nodes = [ this.root ]; nodes.length > 0 && contacts.length < n;) {
+    var node = nodes.pop()
+    if (node.contacts === null) nodes.push(node.right, node.left)
+    else contacts = contacts.concat(sort(node.contacts)).slice(0, n)
+  }
+
+  return contacts
+  */
 }
 
 // Counts the number of contacts recursively.
 // If this is a leaf, just return the number of contacts contained. Otherwise,
 // return the length of the high and low branches combined.
-KBucket.prototype.count = function count () {
-  if (this.bucket !== null) return this.bucket.length
-  return this.high.count() + this.low.count()
+KBucket.prototype.count = function () {
+  // return this.toArray().length
+  var count = 0
+  for (var nodes = [ this.root ]; nodes.length > 0;) {
+    var node = nodes.pop()
+    if (node.contacts === null) nodes.push(node.right, node.left)
+    else count += node.contacts.length
+  }
+  return count
 }
 
-// Determines whether the id at the bitIndex is 0 or 1. If 0, returns -1, else 1
+// Determines whether the id at the bitIndex is 0 or 1.
+// Return left leaf if `id` at `bitIndex` is 0, right leaf otherwise
+// node: internal object that has 2 leafs: left and right
 // id: a Buffer to compare localNodeId with
 // bitIndex: the bitIndex to which bit to check in the id Buffer
-KBucket.prototype._determineBucket = function (id, bitIndex) {
-  bitIndex = bitIndex || 0
-
+KBucket.prototype._determineNode = function (node, id, bitIndex) {
   // **NOTE** remember that id is a Buffer and has granularity of
   // bytes (8 bits), whereas the bitIndex is the _bit_ index (not byte)
 
@@ -198,9 +199,9 @@ KBucket.prototype._determineBucket = function (id, bitIndex) {
   // are extra bits to consider, this means id has less bits than what
   // bitIndex describes, id therefore is too short, and will be put in low
   // bucket
-  var bytesDescribedByBitIndex = parseInt(bitIndex / 8, 10)
+  var bytesDescribedByBitIndex = ~~(bitIndex / 8)
   var bitIndexWithinByte = bitIndex % 8
-  if ((id.length <= bytesDescribedByBitIndex) && (bitIndexWithinByte !== 0)) return -1
+  if ((id.length <= bytesDescribedByBitIndex) && (bitIndexWithinByte !== 0)) return node.left
 
   var byteUnderConsideration = id[bytesDescribedByBitIndex]
 
@@ -211,9 +212,9 @@ KBucket.prototype._determineBucket = function (id, bitIndex) {
   // of all bits being 0, with only one bit set to 1
   // for example, if bitIndexWithinByte is 3, we will construct 00010000 by
   // Math.pow(2, (7 - 3)) -> Math.pow(2, 4) -> 16
-  if (byteUnderConsideration & Math.pow(2, (7 - bitIndexWithinByte))) return 1
+  if (byteUnderConsideration & Math.pow(2, (7 - bitIndexWithinByte))) return node.right
 
-  return -1
+  return node.left
 }
 
 // Get a contact by its exact ID.
@@ -221,122 +222,72 @@ KBucket.prototype._determineBucket = function (id, bitIndex) {
 // contact if we have it or null if not. If this is an inner node, determine
 // which branch of the tree to traverse and repeat.
 // id: Buffer *required* The ID of the contact to fetch.
-// bitIndex: the bitIndex to which bit to check in the Buffer for navigating
-//           the binary tree
-KBucket.prototype._get = function (id, bitIndex) {
-  if (this.bucket === null) {
-    if (this._determineBucket(id, bitIndex++) < 0) {
-      return this.low._get(id, bitIndex)
-    } else {
-      return this.high._get(id, bitIndex)
-    }
+KBucket.prototype.get = function (id) {
+  if (!Buffer.isBuffer(id)) throw new TypeError('id is not a Buffer')
+  var bitIndex = 0
+
+  var node = this.root
+  while (node.contacts === null) {
+    node = this._determineNode(node, id, bitIndex++)
   }
 
-  var index = this._indexOf(id) // index of uses contact id for matching
-  if (index < 0) return null // contact not found
-
-  return this.bucket[index]
+  var index = this._indexOf(node, id) // index of uses contact id for matching
+  return index >= 0 ? node.contacts[index] : null
 }
 
-// Get a contact by its exact ID.
-// If this is a leaf, loop through the bucket contents and return the correct
-// contact if we have it or null if not. If this is an inner node, determine
-// which branch of the tree to traverse and repeat.
-// id: Buffer *required* The ID of the contact to fetch.
-KBucket.prototype.get = function get (id) {
-  if (!Buffer.isBuffer(id)) throw new TypeError('id is not a Buffer')
-  return this._get(id, 0)
-}
-
+// node: internal object that has 2 leafs: left and right
 // id: Buffer Contact node id.
 // Returns the index of the contact with the given id if it exists
-KBucket.prototype._indexOf = function indexOf (id) {
-  for (var i = 0; i < this.bucket.length; i++) {
-    if (bufferEquals(this.bucket[i].id, id)) return i
+KBucket.prototype._indexOf = function (node, id) {
+  for (var i = 0; i < node.contacts.length; ++i) {
+    if (bufferEquals(node.contacts[i].id, id)) return i
   }
 
   return -1
-}
-
-// id: Buffer *required* The ID of the contact to remove.
-// bitIndex: the bitIndex to which bit to check in the Buffer for navigating
-//           the binary tree
-KBucket.prototype._remove = function (id, bitIndex) {
-  // first check whether we are an inner node or a leaf (with bucket contents)
-  if (this.bucket === null) {
-    // this is not a leaf node but an inner node with 'low' and 'high'
-    // branches; we will check the appropriate bit of the identifier and
-    // delegate to the appropriate node for further processing
-    if (this._determineBucket(id, bitIndex++) < 0) {
-      return this.low._remove(id, bitIndex)
-    } else {
-      return this.high._remove(id, bitIndex)
-    }
-  }
-
-  var index = this._indexOf(id)
-  if (index >= 0) {
-    var contact = this.bucket.splice(index, 1)[0]
-    this.root.emit('removed', contact)
-  }
-
-  return this
 }
 
 // id: Buffer *required* he ID of the contact to remove.
-KBucket.prototype.remove = function remove (id) {
+KBucket.prototype.remove = function (id) {
   if (!Buffer.isBuffer(id)) throw new TypeError('id is not a Buffer')
-  return this._remove(id, 0)
-}
+  var bitIndex = 0
 
-// Splits the bucket, redistributes contacts to the new buckets, and marks the
-// bucket that was split as an inner node of the binary tree of buckets by
-// setting this.bucket = null
-// contact: *required* the contact object to add
-// bitIndex: the bitIndex to which byte to check in the Buffer for navigating the
-//          binary tree
-KBucket.prototype._splitAndAdd = function (contact, bitIndex) {
-  this.low = new KBucket({
-    arbiter: this.arbiter,
-    localNodeId: this.localNodeId,
-    numberOfNodesPerKBucket: this.numberOfNodesPerKBucket,
-    numberOfNodesToPing: this.numberOfNodesToPing,
-    root: this.root
-  })
-  this.high = new KBucket({
-    arbiter: this.arbiter,
-    localNodeId: this.localNodeId,
-    numberOfNodesPerKBucket: this.numberOfNodesPerKBucket,
-    numberOfNodesToPing: this.numberOfNodesToPing,
-    root: this.root
-  })
-
-  bitIndex = bitIndex || 0
-
-  // redistribute existing contacts amongst the two newly created buckets
-  this.bucket.forEach(function (storedContact) {
-    if (this._determineBucket(storedContact.id, bitIndex) < 0) {
-      this.low.add(storedContact)
-    } else {
-      this.high.add(storedContact)
-    }
-  }.bind(this))
-
-  this.bucket = null // mark as inner tree node
-
-  // don't split the "far away" bucket
-  // we check where the local node would end up and mark the other one as
-  // "dontSplit" (i.e. "far away")
-  if (this._determineBucket(this.localNodeId, bitIndex) < 0) {
-    // local node belongs to "low" bucket, so mark the other one
-    this.high.dontSplit = true
-  } else {
-    this.low.dontSplit = true
+  var node = this.root
+  while (node.contacts === null) {
+    node = this._determineNode(node, id, bitIndex++)
   }
 
-  // add the contact being added
-  this._add(contact, bitIndex)
+  var index = this._indexOf(node, id)
+  if (index >= 0) {
+    var contact = node.contacts.splice(index, 1)[0]
+    this.emit('removed', contact)
+  }
+
   return this
+}
+
+// Splits the node, redistributes contacts to the new nodes, and marks the
+// node that was split as an inner node of the binary tree of nodes by
+// setting this.root.contacts = null
+// node: *required* node for splitting
+// bitIndex: *required* the bitIndex to which byte to check in the Buffer
+//          for navigating the binary tree
+KBucket.prototype._split = function (node, bitIndex) {
+  node.left = createNode()
+  node.right = createNode()
+
+  // redistribute existing contacts amongst the two newly created nodes
+  for (var i = 0; i < node.contacts.length; ++i) {
+    var contact = node.contacts[i]
+    this._determineNode(node, contact.id, bitIndex).contacts.push(contact)
+  }
+  node.contacts = null // mark as inner tree node
+
+  // don't split the "far away" node
+  // we check where the local node would end up and mark the other one as
+  // "dontSplit" (i.e. "far away")
+  var detNode = this._determineNode(node, this.localNodeId, bitIndex)
+  var otherNode = node.left === detNode ? node.right : node.left
+  otherNode.dontSplit = true
 }
 
 // Returns all the contacts contained in the tree as an array.
@@ -345,8 +296,13 @@ KBucket.prototype._splitAndAdd = function (contact, bitIndex) {
 // misused. If this is not a leaf, return the union of the low and high
 // branches (themselves also as arrays).
 KBucket.prototype.toArray = function () {
-  if (this.bucket !== null) return this.bucket.slice(0)
-  return this.low.toArray().concat(this.high.toArray())
+  var result = []
+  for (var nodes = [ this.root ]; nodes.length > 0;) {
+    var node = nodes.pop()
+    if (node.contacts === null) nodes.push(node.right, node.left)
+    else result = result.concat(node.contacts)
+  }
+  return result
 }
 
 // Updates the contact selected by the arbiter.
@@ -357,22 +313,21 @@ KBucket.prototype.toArray = function () {
 // contacted (by being moved to the right/end of the bucket array).
 // If the selection is our new contact, the old contact is removed and the new
 // contact is marked as most recently contacted.
+// node: internal object that has 2 leafs: left and right
 // contact: *required* the contact to update
 // index: *required* the index in the bucket where contact exists
 //        (index has already been computed in a previous calculation)
-KBucket.prototype._update = function (contact, index) {
+KBucket.prototype._update = function (node, index, contact) {
   // sanity check
-  if (!bufferEquals(this.bucket[index].id, contact.id)) {
-    throw new Error('indexOf() calculation resulted in wrong index')
-  }
+  if (!bufferEquals(node.contacts[index].id, contact.id)) throw new Error('wrong index for _update')
 
-  var incumbent = this.bucket[index]
+  var incumbent = node.contacts[index]
   var selection = this.arbiter(incumbent, contact)
   // if the selection is our old contact and the candidate is some new
   // contact, then there is nothing to do
   if (selection === incumbent && incumbent !== contact) return
 
-  this.bucket.splice(index, 1) // remove old contact
-  this.bucket.push(selection) // add more recent contact version
-  this.root.emit('updated', incumbent, selection)
+  node.contacts.splice(index, 1) // remove old contact
+  node.contacts.push(selection) // add more recent contact version
+  this.emit('updated', incumbent, selection)
 }

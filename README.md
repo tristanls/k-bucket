@@ -25,7 +25,7 @@ var KBucket = require('k-bucket');
 
 var kBucket = new KBucket({
     localNodeId: new Buffer("my node id") // default: random data
-});
+})
 ```
 
 ## Overview
@@ -131,7 +131,6 @@ Finds the XOR distance between firstId and secondId.
     * `localNodeId`: _Buffer_ An optional Buffer representing the local node id. If not provided, a local node id will be created via `crypto.randomBytes(20)`.
     * `numberOfNodesPerKBucket`: _Integer_ _(Default: 20)_ The number of nodes that a k-bucket can contain before being full or split.
     * `numberOfNodesToPing`: _Integer_ _(Default: 3)_ The number of nodes to ping when a bucket that should not be split becomes full. KBucket will emit a `ping` event that contains `numberOfNodesToPing` nodes that have not been contacted the longest.
-    * `root`: _Object_ _**CAUTION: reserved for internal use**_ Provides a reference to the root of the tree data structure as the k-bucket splits when new contacts are added.
 
 Creates a new KBucket.
 
@@ -178,45 +177,43 @@ Removes `contact` with the provided `id`.
 
 Traverses the tree, putting all the contacts into one array.
 
-#### kBucket._determineBucket(id, [bitIndex])
+#### kBucket._determineNode(node, id, [bitIndex])
 
 _**CAUTION: reserved for internal use**_
 
+  * `node`: internal object that has 2 leafs: left and right
   * `id`: _Buffer_ Id to compare `localNodeId` with.
   * `bitIndex`: _Integer_ _(Default: 0)_  The bit index to which bit to check in the `id` Buffer.
-  * Return: _Integer_ -1 if `id` at `bitIndex` is 0, 1 otherwise.
-
-Determines whether the `id` at the `bitIndex` is 0 or 1. If 0, returns -1, else 1.
+  * Return: _Object_ left leaf if `id` at `bitIndex` is 0, right leaf otherwise.
 
 #### kBucket._indexOf(id)
 
 _**CAUTION: reserved for internal use**_
 
+  * `node`: internal object that has 2 leafs: left and right
   * `id`: _Buffer_ Contact node id.
   * Return: _Integer_ Index of `contact` with provided `id` if it exists, -1 otherwise.
 
 Returns the index of the `contact` with provided `id` if it exists, returns -1 otherwise.
 
-#### kBucket._splitAndAdd(contact, [bitIndex])
+#### kBucket._split(node, [bitIndex])
 
 _**CAUTION: reserved for internal use**_
 
-  * `contact`: _Object_ The contact object to add.
-    * `id`: _Buffer_ Contact node id.
-    * Any satellite data that is part of the `contact` object will not be altered, only `id` is used.
+  * `node`: _Object_ node for splitting
   * `bitIndex`: _Integer_ _(Default: 0)_ The bit index to which bit to check in the `id` Buffer.
-  * Return: _Object_ The k-bucket itself.
 
-Splits the bucket, redistributes contacts to the new buckets, and marks the bucket that was split as an inner node of the binary tree of buckets by setting `self.bucket = undefined`. Also, marks the "far away" bucket as `dontSplit`.
+Splits the node, redistributes contacts to the new nodes, and marks the node that was split as an inner node of the binary tree of nodes by setting `self.contacts = null`. Also, marks the "far away" node as `dontSplit`.
 
-#### kBucket._update(contact, index)
+#### kBucket._update(node, index, contact)
 
 _**CAUTION: reserved for internal use**_
 
+  * `node`: internal object that has 2 leafs: left and right
+  * `index`: _Integer_ The index in the bucket where contact exists (index has already been computed in previous calculation).
   * `contact`: _Object_ The contact object to update.
     * `id`: _Buffer_ Contact node id
     * Any satellite data that is part of the `contact` object will not be altered, only `id` is used.
-  * `index`: _Integer_ The index in the bucket where contact exists (index has already been computed in previous calculation).
 
 Updates the `contact` by using the `arbiter` function to compare the incumbent and the candidate. If `arbiter` function selects the old `contact` but the candidate is some new `contact`, then the new `contact` is abandoned. If `arbiter` function selects the old `contact` and the candidate is that same old `contact`, the `contact` is marked as most recently contacted (by being moved to the right/end of the bucket array). If `arbiter` function selects the new `contact`, the old `contact` is removed and the new `contact` is marked as most recently contacted.
 
@@ -268,3 +265,4 @@ The implementation has been sourced from:
 
   - [A formal specification of the Kademlia distributed hash table](http://maude.sip.ucm.es/kademlia/files/pita_kademlia.pdf)
   - [Distributed Hash Tables (part 2)](https://web.archive.org/web/20140217064545/http://offthelip.org/?p=157)
+

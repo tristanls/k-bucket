@@ -17,8 +17,8 @@ test('deprecated vectorClock results in contact drop', function (t) {
   var kBucket = new KBucket()
   var contact = { id: new Buffer('a'), vectorClock: 3 }
   kBucket.add(contact)
-  kBucket._update({ id: new Buffer('a'), vectorClock: 2 }, 0)
-  t.same(kBucket.bucket[0].vectorClock, 3)
+  kBucket._update(kBucket.root, 0, { id: new Buffer('a'), vectorClock: 2 })
+  t.same(kBucket.root.contacts[0].vectorClock, 3)
   t.end()
 })
 
@@ -27,8 +27,8 @@ test('equal vectorClock results in contact marked as most recent', function (t) 
   var contact = { id: new Buffer('a'), vectorClock: 3 }
   kBucket.add(contact)
   kBucket.add({ id: new Buffer('b') })
-  kBucket._update(contact, 0)
-  t.same(kBucket.bucket[1], contact)
+  kBucket._update(kBucket.root, 0, contact)
+  t.same(kBucket.root.contacts[1], contact)
   t.end()
 })
 
@@ -37,11 +37,11 @@ test('more recent vectorClock results in contact update and contact being marked
   var contact = { id: new Buffer('a'), old: 'property', vectorClock: 3 }
   kBucket.add(contact)
   kBucket.add({ id: new Buffer('b') })
-  kBucket._update({ id: new Buffer('a'), newer: 'property', vectorClock: 4 }, 0)
-  t.true(bufferEquals(kBucket.bucket[1].id, contact.id))
-  t.same(kBucket.bucket[1].vectorClock, 4)
-  t.same(kBucket.bucket[1].old, undefined)
-  t.same(kBucket.bucket[1].newer, 'property')
+  kBucket._update(kBucket.root, 0, { id: new Buffer('a'), newer: 'property', vectorClock: 4 })
+  t.true(bufferEquals(kBucket.root.contacts[1].id, contact.id))
+  t.same(kBucket.root.contacts[1].vectorClock, 4)
+  t.same(kBucket.root.contacts[1].old, undefined)
+  t.same(kBucket.root.contacts[1].newer, 'property')
   t.end()
 })
 
@@ -59,7 +59,7 @@ test('should generate "updated"', function (t) {
   kBucket.add(contact2)
 })
 
-test('should generate event "updated" when updating a split bucket', function (t) {
+test('should generate event "updated" when updating a split node', function (t) {
   t.plan(3)
   var kBucket = new KBucket({
     localNodeId: new Buffer('') // need non-random localNodeId for deterministic splits

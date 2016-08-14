@@ -16,6 +16,7 @@ test('closest nodes are returned', function (t) {
   for (var i = 0; i < 0x12; ++i) kBucket.add({ id: new Buffer([ i ]) })
   var contact = { id: new Buffer([ 0x15 ]) } // 00010101
   var contacts = kBucket.closest(contact.id, 3)
+  t.same(contacts.length, 3)
   t.same(contacts[0].id, new Buffer([ 0x11 ])) // distance: 00000100
   t.same(contacts[1].id, new Buffer([ 0x10 ])) // distance: 00000101
   t.same(contacts[2].id, new Buffer([ 0x05 ])) // distance: 00010000

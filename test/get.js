@@ -13,7 +13,7 @@ test('throws TypeError if id is not a Buffer', function (t) {
 
 test('get retrieves null if no contacts', function (t) {
   var kBucket = new KBucket()
-  t.same(null, kBucket.get(new Buffer('foo')))
+  t.same(kBucket.get(new Buffer('foo')), null)
   t.end()
 })
 
