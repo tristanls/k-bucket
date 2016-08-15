@@ -35,6 +35,15 @@ var inherits = require('inherits')
 
 module.exports = KBucket
 
+function defaultDistance (firstId, secondId) {
+  var distance = 0
+  var min = Math.min(firstId.length, secondId.length)
+  var max = Math.max(firstId.length, secondId.length)
+  for (var i = 0; i < min; ++i) distance = distance * 256 + (firstId[i] ^ secondId[i])
+  for (; i < max; ++i) distance = distance * 256 + 255
+  return distance
+}
+
 function defaultArbiter (incumbent, candidate) {
   return incumbent.vectorClock > candidate.vectorClock ? incumbent : candidate
 }
@@ -45,6 +54,10 @@ function createNode () {
 
 /*
   * `options`:
+    * `distance`: _Function_
+        `function (firstId, secondId) { return distance }` An optional
+        `distance` function that gets two `id` Buffers
+        and return distance (as number) between them.
     * `arbiter`: _Function_ _(Default: vectorClock arbiter)_
         `function (incumbent, candidate) { return contact; }` An optional
         `arbiter` function that givent two `contact` objects with the same `id`
@@ -68,6 +81,7 @@ function KBucket (options) {
   if (!Buffer.isBuffer(this.localNodeId)) throw new TypeError('localNodeId is not a Buffer')
   this.numberOfNodesPerKBucket = options.numberOfNodesPerKBucket || 20
   this.numberOfNodesToPing = options.numberOfNodesToPing || 3
+  this.distance = options.distance || defaultDistance
   // use an arbiter from options or vectorClock arbiter by default
   this.arbiter = options.arbiter || defaultArbiter
 
@@ -75,15 +89,6 @@ function KBucket (options) {
 }
 
 inherits(KBucket, EventEmitter)
-
-KBucket.distance = function (firstId, secondId) {
-  var distance = 0
-  var min = Math.min(firstId.length, secondId.length)
-  var max = Math.max(firstId.length, secondId.length)
-  for (var i = 0; i < min; ++i) distance = distance * 256 + (firstId[i] ^ secondId[i])
-  for (; i < max; ++i) distance = distance * 256 + 255
-  return distance
-}
 
 // contact: *required* the contact object to add
 KBucket.prototype.add = function (contact) {
@@ -133,9 +138,10 @@ KBucket.prototype.closest = function (id, n) {
   if (!Buffer.isBuffer(id)) throw new TypeError('id is not a Buffer')
   var contacts = []
 
+  var self = this
   function sort (contacts) {
     return contacts.slice().sort(function (a, b) {
-      return KBucket.distance(a.id, id) - KBucket.distance(b.id, id)
+      return self.distance(a.id, id) - self.distance(b.id, id)
     })
   }
 
