@@ -102,7 +102,6 @@ As even more contacts are added to the "near" k-bucket, the "near" k-bucket will
 As more contacts are added to the "far" k-bucket and it reaches its capacity, it does not split. Instead, the k-bucket emits a "ping" event (register a listener: `kBucket.on('ping', function (oldContacts, newContact) {...});` and includes an array of old contact nodes that it hasn't heard from in a while and requires you to confirm that those contact nodes still respond (literally respond to a PING RPC). If an old contact node still responds, it should be re-added (`kBucket.add(oldContact)`) back to the k-bucket. This puts the old contact on the "recently heard from" end of the list of nodes in the k-bucket. If the old contact does not respond, it should be removed (`kBucket.remove(oldContact.id)`) and the new contact being added now has room to be stored (`kBucket.add(newContact)`).
 
 **Public API**
-  * [KBucket.distance(firstId, secondId)](#kbucketdistancefirstid-secondid)
   * [new KBucket(options)](#new-kbucketoptions)
   * [kBucket.add(contact)](#kbucketaddcontact)
   * [kBucket.closest(id, n)](#kbucketclosestid-n)
@@ -115,17 +114,13 @@ As more contacts are added to the "far" k-bucket and it reaches its capacity, it
   * [Event 'removed'](#event-removed)
   * [Event 'updated'](#event-updated)
 
-#### KBucket.distance(firstId, secondId)
-
-  * `firstId`: _Buffer_ Buffer containing first id.
-  * `secondId`: _Buffer_ Buffer containing second id.
-  * Return: _Integer_ The XOR distance between `firstId` and `secondId`.
-
-Finds the XOR distance between firstId and secondId.
-
 #### new KBucket(options)
 
   * `options`:
+    * `distance`: _Function_
+        `function (firstId, secondId) { return distance }` An optional
+        `distance` function that gets two `id` Buffers
+        and return distance (as number) between them.
     * `arbiter`: _Function_ _(Default: vectorClock arbiter)_
         `function (incumbent, candidate) { return contact; }` An optional `arbiter` function that givent two `contact` objects with the same `id` returns the desired object to be used for updating the k-bucket. For more details, see [arbiter function](#arbiter-function).
     * `localNodeId`: _Buffer_ An optional Buffer representing the local node id. If not provided, a local node id will be created via `crypto.randomBytes(20)`.
