@@ -35,19 +35,6 @@ var inherits = require('inherits')
 
 module.exports = KBucket
 
-function defaultDistance (firstId, secondId) {
-  var distance = 0
-  var min = Math.min(firstId.length, secondId.length)
-  var max = Math.max(firstId.length, secondId.length)
-  for (var i = 0; i < min; ++i) distance = distance * 256 + (firstId[i] ^ secondId[i])
-  for (; i < max; ++i) distance = distance * 256 + 255
-  return distance
-}
-
-function defaultArbiter (incumbent, candidate) {
-  return incumbent.vectorClock > candidate.vectorClock ? incumbent : candidate
-}
-
 function createNode () {
   return { contacts: [], dontSplit: false, left: null, right: null }
 }
@@ -81,14 +68,27 @@ function KBucket (options) {
   if (!Buffer.isBuffer(this.localNodeId)) throw new TypeError('localNodeId is not a Buffer')
   this.numberOfNodesPerKBucket = options.numberOfNodesPerKBucket || 20
   this.numberOfNodesToPing = options.numberOfNodesToPing || 3
-  this.distance = options.distance || defaultDistance
+  this.distance = options.distance || KBucket.distance
   // use an arbiter from options or vectorClock arbiter by default
-  this.arbiter = options.arbiter || defaultArbiter
+  this.arbiter = options.arbiter || KBucket.arbiter
 
   this.root = createNode()
 }
 
 inherits(KBucket, EventEmitter)
+
+KBucket.arbiter = function (incumbent, candidate) {
+  return incumbent.vectorClock > candidate.vectorClock ? incumbent : candidate
+}
+
+KBucket.distance = function (firstId, secondId) {
+  var distance = 0
+  var min = Math.min(firstId.length, secondId.length)
+  var max = Math.max(firstId.length, secondId.length)
+  for (var i = 0; i < min; ++i) distance = distance * 256 + (firstId[i] ^ secondId[i])
+  for (; i < max; ++i) distance = distance * 256 + 255
+  return distance
+}
 
 // contact: *required* the contact object to add
 KBucket.prototype.add = function (contact) {

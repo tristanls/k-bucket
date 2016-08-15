@@ -102,6 +102,8 @@ As even more contacts are added to the "near" k-bucket, the "near" k-bucket will
 As more contacts are added to the "far" k-bucket and it reaches its capacity, it does not split. Instead, the k-bucket emits a "ping" event (register a listener: `kBucket.on('ping', function (oldContacts, newContact) {...});` and includes an array of old contact nodes that it hasn't heard from in a while and requires you to confirm that those contact nodes still respond (literally respond to a PING RPC). If an old contact node still responds, it should be re-added (`kBucket.add(oldContact)`) back to the k-bucket. This puts the old contact on the "recently heard from" end of the list of nodes in the k-bucket. If the old contact does not respond, it should be removed (`kBucket.remove(oldContact.id)`) and the new contact being added now has room to be stored (`kBucket.add(newContact)`).
 
 **Public API**
+  * [KBucket.arbiter(incumbent, candidate)](#kbucketarbiterincumbent-candidate)
+  * [KBucket.distance(firstId, secondId)](#kbucketdistancefirstid-secondid)
   * [new KBucket(options)](#new-kbucketoptions)
   * [kBucket.add(contact)](#kbucketaddcontact)
   * [kBucket.closest(id, n)](#kbucketclosestid-n)
@@ -114,15 +116,29 @@ As more contacts are added to the "far" k-bucket and it reaches its capacity, it
   * [Event 'removed'](#event-removed)
   * [Event 'updated'](#event-updated)
 
+#### KBucket.arbiter(incumbent, candidate)
+
+  * `incumbent`: _Object_ Contact currently stored in the k-bucket.
+  * `candidate`: _Object_ Contact being added to the k-bucket.
+  * Return: _Object_ Contact to updated the k-bucket with.
+
+Default arbiter function for contacts with the same `id`. Uses `contact.vectorClock` to select which contact to update the k-bucket with. Contact with larger `vectorClock` field will be selected. If `vectorClock` is the same, `candidat` will be selected.
+
+#### KBucket.distance(firstId, secondId)
+
+  * `firstId`: _Buffer_ Buffer containing first id.
+  * `secondId`: _Buffer_ Buffer containing second id.
+  * Return: _Integer_ The XOR distance between `firstId` and `secondId`.
+
+Default distance function. Finds the XOR distance between firstId and secondId.
+
 #### new KBucket(options)
 
   * `options`:
-    * `distance`: _Function_
-        `function (firstId, secondId) { return distance }` An optional
-        `distance` function that gets two `id` Buffers
-        and return distance (as number) between them.
     * `arbiter`: _Function_ _(Default: vectorClock arbiter)_
-        `function (incumbent, candidate) { return contact; }` An optional `arbiter` function that givent two `contact` objects with the same `id` returns the desired object to be used for updating the k-bucket. For more details, see [arbiter function](#arbiter-function).
+        `function (incumbent, candidate) { return contact; }` An optional `arbiter` function that given two `contact` objects with the same `id` returns the desired object to be used for updating the k-bucket. For more details, see [arbiter function](#arbiter-function).
+    * `distance`: _Function_
+        `function (firstId, secondId) { return distance }` An optional `distance` function that gets two `id` Buffers and return distance (as number) between them.
     * `localNodeId`: _Buffer_ An optional Buffer representing the local node id. If not provided, a local node id will be created via `crypto.randomBytes(20)`.
     * `numberOfNodesPerKBucket`: _Integer_ _(Default: 20)_ The number of nodes that a k-bucket can contain before being full or split.
     * `numberOfNodesToPing`: _Integer_ _(Default: 3)_ The number of nodes to ping when a bucket that should not be split becomes full. KBucket will emit a `ping` event that contains `numberOfNodesToPing` nodes that have not been contacted the longest.
