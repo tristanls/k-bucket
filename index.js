@@ -157,22 +157,6 @@ KBucket.prototype.closest = function (id, n) {
   }
 
   return contacts
-
-  /*
-  function sort (contacts) {
-    return contacts.slice().sort(function (a, b) {
-      return KBucket.distance(a, id) - KBucket.distance(b, id)
-    })
-  }
-
-  for (var nodes = [ this.root ]; nodes.length > 0 && contacts.length < n;) {
-    var node = nodes.pop()
-    if (node.contacts === null) nodes.push(node.right, node.left)
-    else contacts = contacts.concat(sort(node.contacts)).slice(0, n)
-  }
-
-  return contacts
-  */
 }
 
 // Counts the number of contacts recursively.
