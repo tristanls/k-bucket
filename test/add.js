@@ -2,12 +2,17 @@
 var test = require('tape')
 var KBucket = require('../')
 
-test('throws TypeError if contact.id is not a Buffer', function (t) {
-  var kBucket = new KBucket()
-  var contact = { id: 'foo' }
+test('throws TypeError if contact has not property id', function (t) {
   t.throws(function () {
-    kBucket.add(contact)
-  })
+    (new KBucket()).add(null)
+  }, /^TypeError: contact.id is not a Buffer$/)
+  t.end()
+})
+
+test('throws TypeError if contact.id is not a Buffer', function (t) {
+  t.throws(function () {
+    (new KBucket()).add({ id: 'foo' })
+  }, /^TypeError: contact.id is not a Buffer$/)
   t.end()
 })
 

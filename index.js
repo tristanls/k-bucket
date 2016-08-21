@@ -92,7 +92,7 @@ KBucket.distance = function (firstId, secondId) {
 
 // contact: *required* the contact object to add
 KBucket.prototype.add = function (contact) {
-  if (!Buffer.isBuffer(contact.id)) throw new TypeError('contact.id is not a Buffer')
+  if (!contact || !Buffer.isBuffer(contact.id)) throw new TypeError('contact.id is not a Buffer')
   var bitIndex = 0
 
   var node = this.root
@@ -136,6 +136,8 @@ KBucket.prototype.add = function (contact) {
 // Return: Array of maximum of `n` closest contacts to the node id
 KBucket.prototype.closest = function (id, n) {
   if (!Buffer.isBuffer(id)) throw new TypeError('id is not a Buffer')
+  if (n === undefined) n = Infinity
+  if (typeof n !== 'number' || isNaN(n) || n <= 0) throw new TypeError('n is not positive number')
   var contacts = []
 
   var self = this
@@ -154,6 +156,7 @@ KBucket.prototype.closest = function (id, n) {
     } else {
       contacts = contacts.concat(sort(node.contacts)).slice(0, n)
     }
+    console.log(nodes.length, contacts.length, n)
   }
 
   return contacts

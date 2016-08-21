@@ -3,11 +3,16 @@ var test = require('tape')
 var KBucket = require('../')
 
 test('throws TypeError if contact.id is not a Buffer', function (t) {
-  var kBucket = new KBucket()
-  var contact = { id: 'foo' }
   t.throws(function () {
-    kBucket.closest(contact.id, 4)
-  })
+    (new KBucket()).closest('foo', 4)
+  }, /^TypeError: id is not a Buffer$/)
+  t.end()
+})
+
+test('throw TypeError if n is not number', function (t) {
+  t.throws(function () {
+    (new KBucket()).closest(new Buffer(42), null)
+  }, /^TypeError: n is not positive number$/)
   t.end()
 })
 
@@ -20,6 +25,13 @@ test('closest nodes are returned', function (t) {
   t.same(contacts[0].id, new Buffer([ 0x11 ])) // distance: 00000100
   t.same(contacts[1].id, new Buffer([ 0x10 ])) // distance: 00000101
   t.same(contacts[2].id, new Buffer([ 0x05 ])) // distance: 00010000
+  t.end()
+})
+
+test('n is Infinity by default', function (t) {
+  var kBucket = new KBucket({ localNodeId: new Buffer([ 0x00, 0x00 ]) })
+  for (var i = 0; i < 1e3; ++i) kBucket.add({ id: new Buffer([ ~~(i / 256), i % 256 ]) })
+  t.true(kBucket.closest(new Buffer([ 0x80, 0x80 ])).length > 100)
   t.end()
 })
 
