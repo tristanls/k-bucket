@@ -38,7 +38,7 @@ This Kademlia DHT k-bucket implementation is meant to be as minimal as possible.
 
 ### arbiter function
 
-This *k-bucket* implementation implements a conflict resolution mechanism using an `arbiter` function. The purpose of the `arbiter` is to choose between two `contact` objects with the same `id` but perhaps different properties and determine which one should be stored.  As the `arbiter` function returns the actual object to be stored, it does not need to make an either/or choice, but instead could perform some sort of operation and return the result as a new object that would then be stored. See [kBucket._update(node, contact, index)](#kbucket_updatenode-contact-index) for detailed semantics of which `contact` (`incumbent` or `candidate`) is selected.
+This *k-bucket* implementation implements a conflict resolution mechanism using an `arbiter` function. The purpose of the `arbiter` is to choose between two `contact` objects with the same `id` but perhaps different properties and determine which one should be stored.  As the `arbiter` function returns the actual object to be stored, it does not need to make an either/or choice, but instead could perform some sort of operation and return the result as a new object that would then be stored. See [kBucket._update(node, index, contact)](#kbucket_updatenode-index-contact) for detailed semantics of which `contact` (`incumbent` or `candidate`) is selected.
 
 For example, an `arbiter` function implementing a `vectorClock` mechanism would look something like:
 
