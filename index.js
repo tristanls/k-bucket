@@ -132,7 +132,7 @@ KBucket.prototype.add = function (contact) {
 }
 
 // id: Buffer *required* node id
-// n: Integer *required* maximum number of closest contacts to return
+// n: Integer (Default: Infinity) maximum number of closest contacts to return
 // Return: Array of maximum of `n` closest contacts to the node id
 KBucket.prototype.closest = function (id, n) {
   if (!Buffer.isBuffer(id)) throw new TypeError('id is not a Buffer')
@@ -239,7 +239,7 @@ KBucket.prototype._indexOf = function (node, id) {
   return -1
 }
 
-// id: Buffer *required* he ID of the contact to remove.
+// id: Buffer *required* The ID of the contact to remove.
 KBucket.prototype.remove = function (id) {
   if (!Buffer.isBuffer(id)) throw new TypeError('id is not a Buffer')
   var bitIndex = 0

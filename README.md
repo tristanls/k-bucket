@@ -38,7 +38,7 @@ This Kademlia DHT k-bucket implementation is meant to be as minimal as possible.
 
 ### arbiter function
 
-This *k-bucket* implementation implements a conflict resolution mechanism using an `arbiter` function. The purpose of the `arbiter` is to choose between two `contact` objects with the same `id` but perhaps different properties and determine which one should be stored.  As the `arbiter` function returns the actual object to be stored, it does not need to make an either/or choice, but instead could perform some sort of operation and return the result as a new object that would then be stored. See [kBucket._update(contact, index)](#kbucket_updatecontact-index) for detailed semantics of which `contact` (`incumbent` or `candidate`) is selected.
+This *k-bucket* implementation implements a conflict resolution mechanism using an `arbiter` function. The purpose of the `arbiter` is to choose between two `contact` objects with the same `id` but perhaps different properties and determine which one should be stored.  As the `arbiter` function returns the actual object to be stored, it does not need to make an either/or choice, but instead could perform some sort of operation and return the result as a new object that would then be stored. See [kBucket._update(node, contact, index)](#kbucket_updatenode-contact-index) for detailed semantics of which `contact` (`incumbent` or `candidate`) is selected.
 
 For example, an `arbiter` function implementing a `vectorClock` mechanism would look something like:
 
@@ -157,7 +157,7 @@ Adds a `contact` to the k-bucket.
 #### kBucket.closest(id [, n = Infinity])
 
   * `id`: _Buffer_ Contact node id.
-  * `n`: _Integer_ The maximum number of closest contacts to return (Optional, `Infinity` by default).
+  * `n`: _Integer_ _(Default: Infinity)_ The maximum number of closest contacts to return.
   * Return: _Array_ Maximum of `n` closest contacts to the node id.
 
 Get the `n` closest contacts to the provided node id. "Closest" here means: closest according to the XOR metric of the `contact` node id.
@@ -188,7 +188,7 @@ Removes `contact` with the provided `id`.
 
 Traverses the tree, putting all the contacts into one array.
 
-#### kBucket._determineNode(node, id [, bitIndex])
+#### kBucket._determineNode(node, id [, bitIndex = 0])
 
 _**CAUTION: reserved for internal use**_
 
