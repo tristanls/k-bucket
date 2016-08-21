@@ -106,7 +106,7 @@ As more contacts are added to the "far" k-bucket and it reaches its capacity, it
   * [KBucket.distance(firstId, secondId)](#kbucketdistancefirstid-secondid)
   * [new KBucket(options)](#new-kbucketoptions)
   * [kBucket.add(contact)](#kbucketaddcontact)
-  * [kBucket.closest(id, n)](#kbucketclosestid-n)
+  * [kBucket.closest(id [, n = Infinity])](#kbucketclosestid--n--infinity)
   * [kBucket.count()](#kbucketcount)
   * [kBucket.get(id)](#kbucketgetid)
   * [kBucket.remove(id)](#kbucketremoveid)
@@ -154,10 +154,10 @@ Creates a new KBucket.
 
 Adds a `contact` to the k-bucket.
 
-#### kBucket.closest(id, n)
+#### kBucket.closest(id [, n = Infinity])
 
   * `id`: _Buffer_ Contact node id.
-  * `n`: _Integer_ The maximum number of closest contacts to return.
+  * `n`: _Integer_ The maximum number of closest contacts to return (Optional, `Infinity` by default).
   * Return: _Array_ Maximum of `n` closest contacts to the node id.
 
 Get the `n` closest contacts to the provided node id. "Closest" here means: closest according to the XOR metric of the `contact` node id.
@@ -188,7 +188,7 @@ Removes `contact` with the provided `id`.
 
 Traverses the tree, putting all the contacts into one array.
 
-#### kBucket._determineNode(node, id, [bitIndex])
+#### kBucket._determineNode(node, id [, bitIndex])
 
 _**CAUTION: reserved for internal use**_
 
@@ -207,7 +207,7 @@ _**CAUTION: reserved for internal use**_
 
 Returns the index of the `contact` with provided `id` if it exists, returns -1 otherwise.
 
-#### kBucket._split(node, [bitIndex])
+#### kBucket._split(node [, bitIndex])
 
 _**CAUTION: reserved for internal use**_
 
