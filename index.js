@@ -156,7 +156,6 @@ KBucket.prototype.closest = function (id, n) {
     } else {
       contacts = contacts.concat(sort(node.contacts)).slice(0, n)
     }
-    console.log(nodes.length, contacts.length, n)
   }
 
   return contacts
