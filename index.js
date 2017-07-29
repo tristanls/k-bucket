@@ -52,7 +52,7 @@ function createNode () {
         more details, see [arbiter function](#arbiter-function).
     * `localNodeId`: _Buffer_ An optional Buffer representing the local node id.
         If not provided, a local node id will be created via
-        `crypto.randomBytes(20)`.
+        `crypto.randomBytes(options.idSpace || 20)`.
     * `numberOfNodesPerKBucket`: _Integer_ _(Default: 20)_ The number of nodes
         that a k-bucket can contain before being full or split.
     * `numberOfNodesToPing`: _Integer_ _(Default: 3)_ The number of nodes to
@@ -64,7 +64,7 @@ function KBucket (options) {
   EventEmitter.call(this)
   options = options || {}
 
-  this.localNodeId = options.localNodeId || randomBytes(20)
+  this.localNodeId = options.localNodeId || randomBytes(options.idSpace || 20)
   if (!Buffer.isBuffer(this.localNodeId)) throw new TypeError('localNodeId is not a Buffer')
   this.numberOfNodesPerKBucket = options.numberOfNodesPerKBucket || 20
   this.numberOfNodesToPing = options.numberOfNodesToPing || 3
