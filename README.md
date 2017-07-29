@@ -139,6 +139,7 @@ Default distance function. Finds the XOR distance between firstId and secondId.
         `function (incumbent, candidate) { return contact; }` An optional `arbiter` function that given two `contact` objects with the same `id` returns the desired object to be used for updating the k-bucket. For more details, see [arbiter function](#arbiter-function).
     * `distance`: _Function_
         `function (firstId, secondId) { return distance }` An optional `distance` function that gets two `id` Buffers and return distance (as number) between them.
+    * `idSpace`: _Integer_ _(Default: 20)_ Id space size (in bytes).
     * `localNodeId`: _Buffer_ An optional Buffer representing the local node id. If not provided, a local node id will be created via `crypto.randomBytes(20)`.
     * `numberOfNodesPerKBucket`: _Integer_ _(Default: 20)_ The number of nodes that a k-bucket can contain before being full or split.
     * `numberOfNodesToPing`: _Integer_ _(Default: 3)_ The number of nodes to ping when a bucket that should not be split becomes full. KBucket will emit a `ping` event that contains `numberOfNodesToPing` nodes that have not been contacted the longest.
