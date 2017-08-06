@@ -254,6 +254,10 @@ Emitted when `contact` was removed from the bucket.
 
 Emitted when a previously existing ("previously existing" means `oldContact.id` equals `newContact.id`) contact was added to the bucket and it was replaced with `newContact`.
 
+#### Property: 'metadata'
+
+The `metadata` object serves as a container that can be used by implementations using k-bucket. One example is storing a timestamp to indicate the last time when a node in the bucket was responding to a ping.
+
 ## Releases
 
 [Current releases](https://github.com/tristanls/k-bucket/releases).
