@@ -53,6 +53,10 @@ function createNode () {
     * `localNodeId`: _Buffer_ An optional Buffer representing the local node id.
         If not provided, a local node id will be created via
         `crypto.randomBytes(20)`.
+    * `metadata`: _Object_ _(Default: {})_ Optional satellite data to include
+        with the k-bucket. `metadata` property is guaranteed not be altered by,
+        it is provided as an explicit container for users of k-bucket to store
+        implementation-specific data.
     * `numberOfNodesPerKBucket`: _Integer_ _(Default: 20)_ The number of nodes
         that a k-bucket can contain before being full or split.
     * `numberOfNodesToPing`: _Integer_ _(Default: 3)_ The number of nodes to

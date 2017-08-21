@@ -109,6 +109,7 @@ As more contacts are added to the "far" k-bucket and it reaches its capacity, it
   * [kBucket.closest(id [, n = Infinity])](#kbucketclosestid--n--infinity)
   * [kBucket.count()](#kbucketcount)
   * [kBucket.get(id)](#kbucketgetid)
+  * [kBucket.metadata](#kbucketmetadata)
   * [kBucket.remove(id)](#kbucketremoveid)
   * [kBucket.toArray()](#kbuckettoarray)
   * [Event 'added'](#event-added)
@@ -140,6 +141,7 @@ Default distance function. Finds the XOR distance between firstId and secondId.
     * `distance`: _Function_
         `function (firstId, secondId) { return distance }` An optional `distance` function that gets two `id` Buffers and return distance (as number) between them.
     * `localNodeId`: _Buffer_ An optional Buffer representing the local node id. If not provided, a local node id will be created via `crypto.randomBytes(20)`.
+    * `metadata`: _Object_ _(Default: {})_ Optional satellite data to include with the k-bucket. `metadata` property is guaranteed not be altered, it is provided as an explicit container for users of k-bucket to store implementation-specific data.
     * `numberOfNodesPerKBucket`: _Integer_ _(Default: 20)_ The number of nodes that a k-bucket can contain before being full or split.
     * `numberOfNodesToPing`: _Integer_ _(Default: 3)_ The number of nodes to ping when a bucket that should not be split becomes full. KBucket will emit a `ping` event that contains `numberOfNodesToPing` nodes that have not been contacted the longest.
 
@@ -174,6 +176,12 @@ Counts the total number of contacts in the tree.
   * Return: _Object_ The `contact` if available, otherwise null
 
 Retrieves the `contact`.
+
+#### kBucket.metadata
+
+  * `metadata`: _Object_ _(Default: {})_
+
+The `metadata` property serves as a container that can be used by implementations using k-bucket. One example is storing a timestamp to indicate the last time when a node in the bucket was responding to a ping.
 
 #### kBucket.remove(id)
 
@@ -253,10 +261,6 @@ Emitted when `contact` was removed from the bucket.
   * `newContact`: _Object_ The new contact that is now stored after the update.
 
 Emitted when a previously existing ("previously existing" means `oldContact.id` equals `newContact.id`) contact was added to the bucket and it was replaced with `newContact`.
-
-#### Property: 'metadata'
-
-The `metadata` object serves as a container that can be used by implementations using k-bucket. One example is storing a timestamp to indicate the last time when a node in the bucket was responding to a ping.
 
 ## Releases
 
