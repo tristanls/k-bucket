@@ -73,6 +73,8 @@ function KBucket (options) {
   this.arbiter = options.arbiter || KBucket.arbiter
 
   this.root = createNode()
+
+  this.metadata = Object.assign({}, options.metadata)
 }
 
 inherits(KBucket, EventEmitter)
