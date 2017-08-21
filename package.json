@@ -18,7 +18,8 @@
     "Feross Aboukhadijeh <feross@feross.org>",
     "Nathan Hernandez <email@nathanph.com>",
     "Fabien O'Carroll <fabien@allou.is>",
-    "Kirill Fomichev <fanatid@ya.ru>"
+    "Kirill Fomichev <fanatid@ya.ru>",
+    "Robert Kowalski <rok@kowalski.gd>"
   ],
   "main": "./index.js",
   "repository": {
