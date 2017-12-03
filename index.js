@@ -146,13 +146,6 @@ KBucket.prototype.closest = function (id, n) {
   if (typeof n !== 'number' || isNaN(n) || n <= 0) throw new TypeError('n is not positive number')
   var contacts = []
 
-  var self = this
-  function sort (contacts) {
-    return contacts.slice().sort(function (a, b) {
-      return self.distance(a.id, id) - self.distance(b.id, id)
-    })
-  }
-
   for (var nodes = [ this.root ], bitIndex = 0; nodes.length > 0 && contacts.length < n;) {
     var node = nodes.pop()
     if (node.contacts === null) {
@@ -160,11 +153,16 @@ KBucket.prototype.closest = function (id, n) {
       nodes.push(node.left === detNode ? node.right : node.left)
       nodes.push(detNode)
     } else {
-      contacts = contacts.concat(sort(node.contacts)).slice(0, n)
+      contacts = contacts.concat(node.contacts)
     }
   }
 
-  return contacts
+  var self = this
+  function compare (a, b) {
+    return self.distance(a.id, id) - self.distance(b.id, id)
+  }
+
+  return contacts.sort(compare).slice(0, n)
 }
 
 // Counts the number of contacts recursively.
