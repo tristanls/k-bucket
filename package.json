@@ -19,7 +19,8 @@
     "Nathan Hernandez <email@nathanph.com>",
     "Fabien O'Carroll <fabien@allou.is>",
     "Kirill Fomichev <fanatid@ya.ru>",
-    "Robert Kowalski <rok@kowalski.gd>"
+    "Robert Kowalski <rok@kowalski.gd>",
+    "Nazar Mokrynskyi <nazar@mokrynskyi.com>"
   ],
   "main": "./index.js",
   "repository": {
