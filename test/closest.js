@@ -2,10 +2,10 @@
 var test = require('tape')
 var KBucket = require('../')
 
-test('throws TypeError if contact.id is not a Buffer', function (t) {
+test('throws TypeError if contact.id is not a Uint8Array', function (t) {
   t.throws(function () {
     (new KBucket()).closest('foo', 4)
-  }, /^TypeError: id is not a Buffer$/)
+  }, /^TypeError: id is not a Uint8Array$/)
   t.end()
 })
 

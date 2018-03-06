@@ -3,7 +3,7 @@ var bufferEquals = require('buffer-equals')
 var test = require('tape')
 var KBucket = require('../')
 
-test('throws TypeError if id is not a Buffer', function (t) {
+test('throws TypeError if id is not a Uint8Array', function (t) {
   var kBucket = new KBucket()
   t.throws(function () {
     kBucket.get('foo')
