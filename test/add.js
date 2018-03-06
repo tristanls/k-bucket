@@ -5,14 +5,14 @@ var KBucket = require('../')
 test('throws TypeError if contact has not property id', function (t) {
   t.throws(function () {
     (new KBucket()).add(null)
-  }, /^TypeError: contact.id is not a Buffer$/)
+  }, /^TypeError: contact.id is not a Uint8Array$/)
   t.end()
 })
 
-test('throws TypeError if contact.id is not a Buffer', function (t) {
+test('throws TypeError if contact.id is not a Uint8Array', function (t) {
   t.throws(function () {
     (new KBucket()).add({ id: 'foo' })
-  }, /^TypeError: contact.id is not a Buffer$/)
+  }, /^TypeError: contact.id is not a Uint8Array$/)
   t.end()
 })
 
