@@ -34,12 +34,9 @@ var inherits = require('inherits')
 
 module.exports = KBucket
 
-/**
- * @param {!Uint8Array} array1
- * @param {!Uint8Array} array2
- *
- * @return {boolean}
- */
+// array1: Uint8Array
+// array2: Uint8Array
+// Return: boolean
 function arrayEquals (array1, array2) {
   if (array1 === array2) {
     return true
@@ -71,8 +68,7 @@ function createNode () {
         returns the desired object to be used for updating the k-bucket. For
         more details, see [arbiter function](#arbiter-function).
     * `localNodeId`: _Uint8Array_ An optional Uint8Array representing the local node id.
-        If not provided, a local node id will be created via
-        `crypto.randomBytes(20)`.
+        If not provided, a local node id will be created via `randomBytes(20)`.
     * `metadata`: _Object_ _(Default: {})_ Optional satellite data to include
         with the k-bucket. `metadata` property is guaranteed not be altered by,
         it is provided as an explicit container for users of k-bucket to store
@@ -209,7 +205,8 @@ KBucket.prototype._determineNode = function (node, id, bitIndex) {
   // bytes (8 bits), whereas the bitIndex is the _bit_ index (not byte)
 
   // id's that are too short are put in low bucket (1 byte = 8 bits)
-  // parseInt(bitIndex / 8) finds how many bytes the bitIndex describes
+  // ~~(bitIndex / 8) finds how many bytes the bitIndex describes, "~~" is
+  // equivalent to "parseInt"
   // bitIndex % 8 checks if we have extra bits beyond byte multiples
   // if number of bytes is <= no. of bytes described by bitIndex and there
   // are extra bits to consider, this means id has less bits than what

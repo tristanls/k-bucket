@@ -23,8 +23,18 @@ Kademlia DHT K-bucket implementation as a binary tree.
 ```javascript
 var KBucket = require('k-bucket');
 
-var kBucket = new KBucket({
-    localNodeId: new Buffer("my node id") // default: random data
+var kBucket1 = new KBucket({
+    localNodeId: Buffer.from("my node id") // default: random data
+})
+// or without using Buffer (for example, in the browser)
+var id = "my node id";
+var nodeId = new Uint8Array(id.length);
+for (var i = 0, len = nodeId.length; i < len; ++i)
+{
+    nodeId[i] = id.charCodeAt(i);
+}
+var kBucket2 = new KBucket({
+    localNodeId: nodeId // default: random data
 })
 ```
 
@@ -45,7 +55,7 @@ For example, an `arbiter` function implementing a `vectorClock` mechanism would 
 ```javascript
 // contact example
 var contact = {
-    id: new Buffer('contactId'),
+    id: Buffer.from('contactId'),
     vectorClock: 0
 };
 
@@ -62,7 +72,7 @@ Alternatively, consider an arbiter that implements a Grow-Only-Set CRDT mechanis
 ```javascript
 // contact example
 var contact = {
-    id: new Buffer('workerService'),
+    id: Buffer.from('workerService'),
     workerNodes: {
         '17asdaf7effa2': { host: '127.0.0.1', port: 1337 },
         '17djsyqeryasu': { host: '127.0.0.1', port: 1338 }
