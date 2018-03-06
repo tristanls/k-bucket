@@ -10,7 +10,7 @@ test('count returns 0 when no contacts in bucket', function (t) {
 
 test('count returns 1 when 1 contact in bucket', function (t) {
   var kBucket = new KBucket()
-  var contact = { id: new Buffer('a') }
+  var contact = { id: Buffer.from('a') }
   kBucket.add(contact)
   t.same(kBucket.count(), 1)
   t.end()
@@ -18,7 +18,7 @@ test('count returns 1 when 1 contact in bucket', function (t) {
 
 test('count returns 1 when same contact added to bucket twice', function (t) {
   var kBucket = new KBucket()
-  var contact = { id: new Buffer('a') }
+  var contact = { id: Buffer.from('a') }
   kBucket.add(contact)
   kBucket.add(contact)
   t.same(kBucket.count(), 1)
@@ -27,16 +27,16 @@ test('count returns 1 when same contact added to bucket twice', function (t) {
 
 test('count returns number of added unique contacts', function (t) {
   var kBucket = new KBucket()
-  kBucket.add({ id: new Buffer('a') })
-  kBucket.add({ id: new Buffer('a') })
-  kBucket.add({ id: new Buffer('b') })
-  kBucket.add({ id: new Buffer('b') })
-  kBucket.add({ id: new Buffer('c') })
-  kBucket.add({ id: new Buffer('d') })
-  kBucket.add({ id: new Buffer('c') })
-  kBucket.add({ id: new Buffer('d') })
-  kBucket.add({ id: new Buffer('e') })
-  kBucket.add({ id: new Buffer('f') })
+  kBucket.add({ id: Buffer.from('a') })
+  kBucket.add({ id: Buffer.from('a') })
+  kBucket.add({ id: Buffer.from('b') })
+  kBucket.add({ id: Buffer.from('b') })
+  kBucket.add({ id: Buffer.from('c') })
+  kBucket.add({ id: Buffer.from('d') })
+  kBucket.add({ id: Buffer.from('c') })
+  kBucket.add({ id: Buffer.from('d') })
+  kBucket.add({ id: Buffer.from('e') })
+  kBucket.add({ id: Buffer.from('f') })
   t.same(kBucket.count(), 6)
   t.end()
 })

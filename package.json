@@ -41,8 +41,8 @@
   },
   "devDependencies": {
     "buffer-equals": "^1.0.3",
-    "nyc": "^6.4.4",
-    "standard": "^7.0.1",
+    "nyc": "^11.4.1",
+    "standard": "^11.0.0",
     "tape": "^4.5.1"
   }
 }

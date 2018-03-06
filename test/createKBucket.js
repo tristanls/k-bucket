@@ -12,7 +12,7 @@ test('localNodeId should be a random SHA-1 if not provided', function (t) {
 })
 
 test('localNodeId is a Buffer populated from options if options.localNodeId Buffer is provided', function (t) {
-  var localNodeId = new Buffer('some length')
+  var localNodeId = Buffer.from('some length')
   var kBucket = new KBucket({ localNodeId: localNodeId })
   t.true(kBucket.localNodeId instanceof Buffer)
   t.true(bufferEquals(kBucket.localNodeId, localNodeId))

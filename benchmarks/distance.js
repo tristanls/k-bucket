@@ -1,8 +1,8 @@
 'use strict'
 var KBucket = require('../index')
 
-var _0000000100100100 = new Buffer('0124', 'hex')
-var _0100000000100100 = new Buffer('4024', 'hex')
+var _0000000100100100 = Buffer.from('0124', 'hex')
+var _0100000000100100 = Buffer.from('4024', 'hex')
 
 var hrtime = process.hrtime()
 for (var i = 0; i < 1e7; i++) {

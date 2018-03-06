@@ -4,7 +4,7 @@ var KBucket = require('../')
 
 test('adding a contact does not split node', function (t) {
   var kBucket = new KBucket()
-  kBucket.add({ id: new Buffer('a') })
+  kBucket.add({ id: Buffer.from('a') })
   t.same(kBucket.root.left, null)
   t.same(kBucket.root.right, null)
   t.notSame(kBucket.root.contacts, null)
@@ -14,7 +14,7 @@ test('adding a contact does not split node', function (t) {
 test('adding maximum number of contacts (per node) [20] into node does not split node', function (t) {
   var kBucket = new KBucket()
   for (var i = 0; i < kBucket.numberOfNodesPerKBucket; ++i) {
-    kBucket.add({ id: new Buffer('' + i) })
+    kBucket.add({ id: Buffer.from('' + i) })
   }
   t.same(kBucket.root.left, null)
   t.same(kBucket.root.right, null)
@@ -25,7 +25,7 @@ test('adding maximum number of contacts (per node) [20] into node does not split
 test('adding maximum number of contacts (per node) + 1 [21] into node splits the node', function (t) {
   var kBucket = new KBucket()
   for (var i = 0; i < kBucket.numberOfNodesPerKBucket + 1; ++i) {
-    kBucket.add({ id: new Buffer('' + i) })
+    kBucket.add({ id: Buffer.from('' + i) })
   }
   t.notSame(kBucket.root.left, null)
   t.notSame(kBucket.root.right, null)
@@ -35,10 +35,10 @@ test('adding maximum number of contacts (per node) + 1 [21] into node splits the
 
 test('split nodes contain all added contacts', function (t) {
   t.plan(20 /* numberOfNodesPerKBucket */ + 2)
-  var kBucket = new KBucket({ localNodeId: new Buffer([ 0x00 ]) })
+  var kBucket = new KBucket({ localNodeId: Buffer.from([ 0x00 ]) })
   var foundContact = {}
   for (var i = 0; i < kBucket.numberOfNodesPerKBucket + 1; ++i) {
-    kBucket.add({ id: new Buffer([ i ]) })
+    kBucket.add({ id: Buffer.from([ i ]) })
     foundContact[i] = false
   }
   var traverse = function (node) {
@@ -59,9 +59,9 @@ test('split nodes contain all added contacts', function (t) {
 
 test('when splitting nodes the "far away" node should be marked to prevent splitting "far away" node', function (t) {
   t.plan(5)
-  var kBucket = new KBucket({ localNodeId: new Buffer([ 0x00 ]) })
+  var kBucket = new KBucket({ localNodeId: Buffer.from([ 0x00 ]) })
   for (var i = 0; i < kBucket.numberOfNodesPerKBucket + 1; ++i) {
-    kBucket.add({ id: new Buffer([ i ]) })
+    kBucket.add({ id: Buffer.from([ i ]) })
   }
   // above algorithm will split left node 4 times and put 0x00 through 0x0f
   // in the left node, and put 0x10 through 0x14 in right node
