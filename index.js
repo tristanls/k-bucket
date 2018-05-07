@@ -168,7 +168,7 @@ KBucket.prototype.closest = function (id, n) {
   if (typeof n !== 'number' || isNaN(n) || n <= 0) throw new TypeError('n is not positive number')
 
   var self = this
-  return getAllContacts(this.root)
+  return this.toArray()
     .sort(function (a, b) {
       return self.distance(a.id, id) - self.distance(b.id, id)
     })
@@ -303,13 +303,7 @@ KBucket.prototype._split = function (node, bitIndex) {
 // misused. If this is not a leaf, return the union of the low and high
 // branches (themselves also as arrays).
 KBucket.prototype.toArray = function () {
-  var result = []
-  for (var nodes = [ this.root ]; nodes.length > 0;) {
-    var node = nodes.pop()
-    if (node.contacts === null) nodes.push(node.right, node.left)
-    else result = result.concat(node.contacts)
-  }
-  return result
+  return getAllContacts(this.root)
 }
 
 // Updates the contact selected by the arbiter.
