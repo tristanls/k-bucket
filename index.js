@@ -56,6 +56,12 @@ function createNode () {
   return { contacts: [], dontSplit: false, left: null, right: null }
 }
 
+// node: Object
+// Return: Array of contacts
+function getAllContacts (node) {
+  return node.contacts || getAllContacts(node.left).concat(getAllContacts(node.right))
+}
+
 /*
   * `options`:
     * `distance`: _Function_
@@ -160,25 +166,13 @@ KBucket.prototype.closest = function (id, n) {
   if (!(id instanceof Uint8Array)) throw new TypeError('id is not a Uint8Array')
   if (n === undefined) n = Infinity
   if (typeof n !== 'number' || isNaN(n) || n <= 0) throw new TypeError('n is not positive number')
-  var contacts = []
-
-  for (var nodes = [ this.root ], bitIndex = 0; nodes.length > 0 && contacts.length < n;) {
-    var node = nodes.pop()
-    if (node.contacts === null) {
-      var detNode = this._determineNode(node, id, bitIndex++)
-      nodes.push(node.left === detNode ? node.right : node.left)
-      nodes.push(detNode)
-    } else {
-      contacts = contacts.concat(node.contacts)
-    }
-  }
 
   var self = this
   function compare (a, b) {
     return self.distance(a.id, id) - self.distance(b.id, id)
   }
 
-  return contacts.sort(compare).slice(0, n)
+  return getAllContacts(this.root).sort(compare).slice(0, n)
 }
 
 // Counts the number of contacts recursively.
