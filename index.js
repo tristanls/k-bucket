@@ -181,10 +181,10 @@ KBucket.prototype.closest = function (id, n) {
     .sort(function (a, b) {
       return a[0] - b[0]
     })
+    .slice(0, n)
     .map(function (a) {
       return a[1]
     })
-    .slice(0, n)
 }
 
 // Counts the number of contacts recursively.
