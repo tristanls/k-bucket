@@ -29,6 +29,7 @@
   },
   "scripts": {
     "benchmark:add": "node benchmarks/add.js",
+    "benchmark:closest": "node benchmarks/closest.js",
     "benchmark:distance": "node benchmarks/distance.js",
     "coverage": "nyc tape test/*.js",
     "lint": "standard",
