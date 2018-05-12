@@ -174,11 +174,17 @@ KBucket.prototype.closest = function (id, n) {
   }
 
   var self = this
-  function compare (a, b) {
-    return self.distance(a.id, id) - self.distance(b.id, id)
-  }
-
-  return contacts.sort(compare).slice(0, n)
+  return contacts
+    .map(function (a) {
+      return [self.distance(a.id, id), a]
+    })
+    .sort(function (a, b) {
+      return a[0] - b[0]
+    })
+    .slice(0, n)
+    .map(function (a) {
+      return a[1]
+    })
 }
 
 // Counts the number of contacts recursively.
