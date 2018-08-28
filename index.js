@@ -3,7 +3,7 @@ index.js - Kademlia DHT K-bucket implementation as a binary tree.
 
 The MIT License (MIT)
 
-Copyright (c) 2013-2016 Tristan Slominski
+Copyright (c) 2013-2018 Tristan Slominski
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
@@ -275,10 +275,10 @@ class KBucket extends EventEmitter {
     // byteUnderConsideration is an integer from 0 to 255 represented by 8 bits
     // where 255 is 11111111 and 0 is 00000000
     // in order to find out whether the bit at bitIndexWithinByte is set
-    // we construct Math.pow(2, (7 - bitIndexWithinByte)) which will consist
+    // we construct (1 << (7 - bitIndexWithinByte)) which will consist
     // of all bits being 0, with only one bit set to 1
     // for example, if bitIndexWithinByte is 3, we will construct 00010000 by
-    // Math.pow(2, (7 - 3)) -> Math.pow(2, 4) -> 16
+    // (1 << (7 - 3)) -> (1 << 4) -> 16
     if (byteUnderConsideration & (1 << (7 - bitIndexWithinByte))) {
       return node.right
     }
