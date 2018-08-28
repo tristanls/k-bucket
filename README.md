@@ -21,20 +21,19 @@ Kademlia DHT K-bucket implementation as a binary tree.
 ## Usage
 
 ```javascript
-var KBucket = require('k-bucket');
+const KBucket = require('k-bucket')
 
-var kBucket1 = new KBucket({
-    localNodeId: Buffer.from("my node id") // default: random data
+const kBucket1 = new KBucket({
+    localNodeId: Buffer.from('my node id') // default: random data
 })
 // or without using Buffer (for example, in the browser)
-var id = "my node id";
-var nodeId = new Uint8Array(id.length);
-for (var i = 0, len = nodeId.length; i < len; ++i)
-{
-    nodeId[i] = id.charCodeAt(i);
+const id = 'my node id'
+const nodeId = new Uint8Array(id.length)
+for (let i = 0, len = nodeId.length; i < len; ++i) {
+  nodeId[i] = id.charCodeAt(i)
 }
-var kBucket2 = new KBucket({
-    localNodeId: nodeId // default: random data
+const kBucket2 = new KBucket({
+  localNodeId: nodeId // default: random data
 })
 ```
 
@@ -71,7 +70,7 @@ Alternatively, consider an arbiter that implements a Grow-Only-Set CRDT mechanis
 
 ```javascript
 // contact example
-var contact = {
+const contact = {
     id: Buffer.from('workerService'),
     workerNodes: {
         '17asdaf7effa2': { host: '127.0.0.1', port: 1337 },
@@ -82,16 +81,16 @@ var contact = {
 function arbiter(incumbent, candidate) {
     // we create a new object so that our selection is guaranteed to replace
     // the incumbent
-    var merged = {
+    const merged = {
         id: incumbent.id, // incumbent.id === candidate.id within an arbiter
         workerNodes: incumbent.workerNodes
-    };
+    }
 
-    Object.keys(candidate.workerNodes).forEach(function (workerNodeId) {
+    Object.keys(candidate.workerNodes).forEach(workerNodeId => {
         merged.workerNodes[workerNodeId] = candidate.workerNodes[workerNodeId];
-    });
+    })
 
-    return merged;
+    return merged
 }
 ```
 
@@ -294,4 +293,3 @@ The implementation has been sourced from:
 
   - [A formal specification of the Kademlia distributed hash table](http://maude.sip.ucm.es/kademlia/files/pita_kademlia.pdf)
   - [Distributed Hash Tables (part 2)](https://web.archive.org/web/20140217064545/http://offthelip.org/?p=157)
-
