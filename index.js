@@ -451,7 +451,7 @@ function nodeToObject (n) {
       var idstr = n.contacts.map(function (c) {
         return c.id.toString('hex').toUpperCase()
       }).join(',')
-      ret.b = (n.far || n.dontSplit ? '!' : '') + idstr
+      ret.b = (n.dontSplit ? '!' : '') + idstr
     }
   }
   return ret
