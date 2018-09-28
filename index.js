@@ -264,26 +264,9 @@ class KBucket extends EventEmitter {
     // are extra bits to consider, this means id has less bits than what
     // bitIndex describes, id therefore is too short, and will be put in low
     // bucket
-    const bytesDescribedByBitIndex = bitIndex >> 3
-    const bitIndexWithinByte = bitIndex % 8
-    if ((id.length <= bytesDescribedByBitIndex) && (bitIndexWithinByte !== 0)) {
-      return node.left
-    }
 
-    const byteUnderConsideration = id[bytesDescribedByBitIndex]
-
-    // byteUnderConsideration is an integer from 0 to 255 represented by 8 bits
-    // where 255 is 11111111 and 0 is 00000000
-    // in order to find out whether the bit at bitIndexWithinByte is set
-    // we construct (1 << (7 - bitIndexWithinByte)) which will consist
-    // of all bits being 0, with only one bit set to 1
-    // for example, if bitIndexWithinByte is 3, we will construct 00010000 by
-    // (1 << (7 - 3)) -> (1 << 4) -> 16
-    if (byteUnderConsideration & (1 << (7 - bitIndexWithinByte))) {
-      return node.right
-    }
-
-    return node.left
+    const b = id[bitIndex >> 3] // bitIndex >> 3 == number of bytes
+    return (b && (b & (0x80 >> (bitIndex % 8)))) ? node.right : node.left // handles short ids
   }
 
   /**
@@ -399,6 +382,10 @@ class KBucket extends EventEmitter {
     return result
   }
 
+  toObject () {
+    return nodeToObject(this.root)
+  }
+
   /**
    * Updates the contact selected by the arbiter.
    * If the selection is our old contact and the candidate is some new contact
@@ -432,5 +419,44 @@ class KBucket extends EventEmitter {
     this.emit('updated', incumbent, selection)
   }
 }
+
+/**
+ * Converts the graph starting at the given node into condensed minimal object form with tiny names and values
+ * to facilitate debugging and testing.
+ *
+ *  let kb = new KBucket(0x80)
+ *  let ids = [ 0x80, 0xC0, 0xE0, 0xF0, 0xF8 ]
+ *  ids.forEach( id => kb.add(id) )
+ *
+ *  assert.deepEqual(
+ *    kb.toObj(),
+ *    { l:{ c:'!00' }, r:{ l:{ c:'80,81' }, r:{ c:'!C0,E0,F0' } } }
+ *  )
+ *
+ * key abbreviations:
+ *
+ *    node.left -> l
+ *    node.right -> r
+ *    node.contacts -> c
+ *
+ * node.contacts are reduced to comma-separated hex string of their id and node.dontSplit is indicated as a ! prefix.
+ */
+function nodeToObject (n) {
+  var ret = {}
+  if (n.contacts == null) {
+    if (!isEmpty(n.left)) { ret.l = nodeToObject(n.left) }
+    if (!isEmpty(n.right)) { ret.r = nodeToObject(n.right) }
+  } else {
+    if (n.contacts.length) {
+      var idstr = n.contacts.map(function (c) {
+        return c.id.toString('hex').toUpperCase()
+      }).join(',')
+      ret.b = (n.dontSplit ? '!' : '') + idstr
+    }
+  }
+  return ret
+}
+
+function isEmpty (n) { return n == null || (n.left == null && n.right == null && n.contacts.length === 0) }
 
 module.exports = KBucket
