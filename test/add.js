@@ -1,5 +1,5 @@
 'use strict'
-var test = require('tape')
+var test = require('test-kit')('tape')
 var KBucket = require('../')
 
 test('throws TypeError if contact has not property id', function (t) {
@@ -14,6 +14,31 @@ test('throws TypeError if contact.id is not a Uint8Array', function (t) {
     (new KBucket()).add({ id: 'foo' })
   }, /^TypeError: contact.id is not a Uint8Array$/)
   t.end()
+})
+
+test('add', function (t) {
+  t.table_assert([
+    [ 'lid', 'npb', 'addIds', 'exp' ],
+    '# add existing contact',
+    [ '80', 4, '80', { b: '80' } ],
+    '# add single contact',
+    [ '80', 4, 'C0', { b: 'C0' } ],
+    '# add no split',
+    [ '80', 4, '80,C0,E0,F0', { b: '80,C0,E0,F0' } ],
+    '# add with splits',
+    [ '80', 4, '80,C0,E0,F0,F8', { r: { l: { b: '80' }, r: { b: '!C0,E0,F0,F8' } } } ],
+    [ '80', 4, '80,C0,E0,F0,00', { l: { b: '!00' }, r: { b: '80,C0,E0,F0' } } ],
+    [ '80', 4, '80,C0,E0,F0,00,81', { l: { b: '!00' }, r: { l: { b: '80,81' }, r: { b: '!C0,E0,F0' } } } ],
+    [ '80', 4, '80,A0,00,70,71', { l: { b: '!00,70,71' }, r: { b: '80,A0' } } ],
+    [ '80', 4, '81,82,83,84,85', { r: { l: { l: { l: { l: { l: { b: '81,82,83' }, r: { b: '!84,85' } } } } } } } ],
+    [ '80', 4, '81,71,82,72,83', { l: { b: '!71,72' }, r: { b: '81,82,83' } } ],
+    [ '80', 4, '71,82,72,83,73', { l: { b: '!71,72,73' }, r: { b: '82,83' } } ]
+  ], function (lid, npb, addIds) {
+    var kBucket = new KBucket({ localNodeId: Buffer.from(lid, 'hex'), numberOfNodesPerKBucket: npb })
+    addIds.split(',').forEach(function (id) { kBucket.add({ id: Buffer.from(id, 'hex') }) })
+    console.log(JSON.stringify(kBucket.toObject()))
+    return kBucket.toObject()
+  })
 })
 
 test('adding a contact places it in root node', function (t) {
