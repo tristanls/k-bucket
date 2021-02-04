@@ -121,6 +121,7 @@ As more contacts are added to the "far" k-bucket and it reaches its capacity, it
   * [kBucket.metadata](#kbucketmetadata)
   * [kBucket.remove(id)](#kbucketremoveid)
   * [kBucket.toArray()](#kbuckettoarray)
+  * [kBucket.toIterable()](#kbuckettoiterable)
   * [Event 'added'](#event-added)
   * [Event 'ping'](#event-ping)
   * [Event 'removed'](#event-removed)
@@ -204,6 +205,12 @@ Removes `contact` with the provided `id`.
   * Return: _Array_ All of the contacts in the tree, as an array
 
 Traverses the tree, putting all the contacts into one array.
+
+#### kBucket.toIterable()
+
+  * Return: _Iterable_ All of the contacts in the tree, as an iterable
+
+Traverses the tree, yielding contacts as they are encountered.
 
 #### kBucket._determineNode(node, id [, bitIndex = 0])
 
