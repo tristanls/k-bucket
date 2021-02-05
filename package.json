@@ -41,7 +41,6 @@
     "randombytes": "^2.0.3"
   },
   "devDependencies": {
-    "buffer-equals": "^1.0.3",
     "nyc": "^11.7.3",
     "standard": "^11.0.1",
     "tape": "^4.5.1"

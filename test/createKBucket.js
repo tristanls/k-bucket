@@ -1,5 +1,4 @@
 'use strict'
-var bufferEquals = require('buffer-equals')
 var EventEmitter = require('events').EventEmitter
 var test = require('tape')
 var KBucket = require('../')
@@ -15,7 +14,7 @@ test('localNodeId is a Buffer populated from options if options.localNodeId Buff
   var localNodeId = Buffer.from('some length')
   var kBucket = new KBucket({ localNodeId: localNodeId })
   t.true(kBucket.localNodeId instanceof Buffer)
-  t.true(bufferEquals(kBucket.localNodeId, localNodeId))
+  t.true(localNodeId.equals(kBucket.localNodeId))
   t.end()
 })
 
