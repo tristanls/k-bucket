@@ -1,6 +1,6 @@
 {
   "name": "k-bucket",
-  "version": "5.0.0",
+  "version": "5.1.0",
   "description": "Kademlia DHT K-bucket implementation as a binary tree",
   "keywords": [
     "k-bucket",
