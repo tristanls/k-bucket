@@ -400,6 +400,22 @@ class KBucket extends EventEmitter {
   }
 
   /**
+   * Similar to `toArray()` but instead of buffering everything up into an
+   * array before returning it, yield contacts as they are encountered while
+   * walking the tree
+   */
+  * toIterable () {
+    for (const nodes = [ this.root ]; nodes.length > 0;) {
+      const node = nodes.pop()
+      if (node.contacts === null) {
+        nodes.push(node.right, node.left)
+      } else {
+        yield * node.contacts
+      }
+    }
+  }
+
+  /**
    * Updates the contact selected by the arbiter.
    * If the selection is our old contact and the candidate is some new contact
    * then the new contact is abandoned (not added).
