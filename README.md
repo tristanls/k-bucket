@@ -8,7 +8,7 @@ Kademlia DHT K-bucket implementation as a binary tree.
 
 ## Contributors
 
-[@tristanls](https://github.com/tristanls), [@mikedeboer](https://github.com/mikedeboer), [@deoxxa](https://github.com/deoxxa), [@feross](https://github.com/feross), [@nathanph](https://github.com/nathanph), [@allouis](https://github.com/allouis), [@fanatid](https://github.com/fanatid), [@robertkowalski](https://github.com/robertkowalski), [@nazar-pc](https://github.com/nazar-pc), [@jimmywarting](https://github.com/jimmywarting)
+[@tristanls](https://github.com/tristanls), [@mikedeboer](https://github.com/mikedeboer), [@deoxxa](https://github.com/deoxxa), [@feross](https://github.com/feross), [@nathanph](https://github.com/nathanph), [@allouis](https://github.com/allouis), [@fanatid](https://github.com/fanatid), [@robertkowalski](https://github.com/robertkowalski), [@nazar-pc](https://github.com/nazar-pc), [@jimmywarting](https://github.com/jimmywarting), [@achingbrain](https://github.com/achingbrain)
 
 ## Installation
 

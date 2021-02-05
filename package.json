@@ -21,7 +21,8 @@
     "Kirill Fomichev <fanatid@ya.ru>",
     "Robert Kowalski <rok@kowalski.gd>",
     "Nazar Mokrynskyi <nazar@mokrynskyi.com>",
-    "Jimmy Wärting <jimmy@warting.se>"
+    "Jimmy Wärting <jimmy@warting.se>",
+    "Alex Potsides <alex@achingbrain.net>"
   ],
   "main": "./index.js",
   "repository": {

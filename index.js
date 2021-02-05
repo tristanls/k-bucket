@@ -3,7 +3,7 @@ index.js - Kademlia DHT K-bucket implementation as a binary tree.
 
 The MIT License (MIT)
 
-Copyright (c) 2013-2018 Tristan Slominski
+Copyright (c) 2013-2021 Tristan Slominski
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
@@ -382,10 +382,8 @@ class KBucket extends EventEmitter {
 
   /**
    * Returns all the contacts contained in the tree as an array.
-   * If this is a leaf, return a copy of the bucket. `slice` is used so that we
-   * don't accidentally leak an internal reference out that might be
-   * accidentally misused. If this is not a leaf, return the union of the low
-   * and high branches (themselves also as arrays).
+   * If this is a leaf, return a copy of the bucket. If this is not a leaf,
+   * return the union of the low and high branches (themselves also as arrays).
    *
    * @return {Array} All of the contacts in the tree, as an array
    */
@@ -401,11 +399,13 @@ class KBucket extends EventEmitter {
 
   /**
    * Similar to `toArray()` but instead of buffering everything up into an
-   * array before returning it, yield contacts as they are encountered while
-   * walking the tree
+   * array before returning it, yields contacts as they are encountered while
+   * walking the tree.
+   *
+   * @return {Iterable} All of the contacts in the tree, as an iterable
    */
   * toIterable () {
-    for (const nodes = [ this.root ]; nodes.length > 0;) {
+    for (const nodes = [this.root]; nodes.length > 0;) {
       const node = nodes.pop()
       if (node.contacts === null) {
         nodes.push(node.right, node.left)
