@@ -1,10 +1,10 @@
 'use strict'
-var test = require('tape')
-var KBucket = require('../')
+const test = require('tape')
+const KBucket = require('../')
 
 test('invalid index results in exception', function (t) {
-  var kBucket = new KBucket()
-  var contact = { id: Buffer.from('a') }
+  const kBucket = new KBucket()
+  const contact = { id: Buffer.from('a') }
   kBucket.add(contact)
   t.throws(function () {
     kBucket._update(contact, 1)
@@ -13,8 +13,8 @@ test('invalid index results in exception', function (t) {
 })
 
 test('deprecated vectorClock results in contact drop', function (t) {
-  var kBucket = new KBucket()
-  var contact = { id: Buffer.from('a'), vectorClock: 3 }
+  const kBucket = new KBucket()
+  const contact = { id: Buffer.from('a'), vectorClock: 3 }
   kBucket.add(contact)
   kBucket._update(kBucket.root, 0, { id: Buffer.from('a'), vectorClock: 2 })
   t.same(kBucket.root.contacts[0].vectorClock, 3)
@@ -22,8 +22,8 @@ test('deprecated vectorClock results in contact drop', function (t) {
 })
 
 test('equal vectorClock results in contact marked as most recent', function (t) {
-  var kBucket = new KBucket()
-  var contact = { id: Buffer.from('a'), vectorClock: 3 }
+  const kBucket = new KBucket()
+  const contact = { id: Buffer.from('a'), vectorClock: 3 }
   kBucket.add(contact)
   kBucket.add({ id: Buffer.from('b') })
   kBucket._update(kBucket.root, 0, contact)
@@ -32,8 +32,8 @@ test('equal vectorClock results in contact marked as most recent', function (t) 
 })
 
 test('more recent vectorClock results in contact update and contact being marked as most recent', function (t) {
-  var kBucket = new KBucket()
-  var contact = { id: Buffer.from('a'), old: 'property', vectorClock: 3 }
+  const kBucket = new KBucket()
+  const contact = { id: Buffer.from('a'), old: 'property', vectorClock: 3 }
   kBucket.add(contact)
   kBucket.add({ id: Buffer.from('b') })
   kBucket._update(kBucket.root, 0, { id: Buffer.from('a'), newer: 'property', vectorClock: 4 })
@@ -46,9 +46,9 @@ test('more recent vectorClock results in contact update and contact being marked
 
 test('should generate "updated"', function (t) {
   t.plan(2)
-  var kBucket = new KBucket()
-  var contact1 = { id: Buffer.from('a'), vectorClock: 1 }
-  var contact2 = { id: Buffer.from('a'), vectorClock: 2 }
+  const kBucket = new KBucket()
+  const contact1 = { id: Buffer.from('a'), vectorClock: 1 }
+  const contact2 = { id: Buffer.from('a'), vectorClock: 2 }
   kBucket.on('updated', function (oldContact, newContact) {
     t.same(oldContact, contact1)
     t.same(newContact, contact2)
@@ -60,15 +60,15 @@ test('should generate "updated"', function (t) {
 
 test('should generate event "updated" when updating a split node', function (t) {
   t.plan(3)
-  var kBucket = new KBucket({
+  const kBucket = new KBucket({
     localNodeId: Buffer.from('') // need non-random localNodeId for deterministic splits
   })
-  for (var i = 0; i < kBucket.numberOfNodesPerKBucket + 1; ++i) {
+  for (let i = 0; i < kBucket.numberOfNodesPerKBucket + 1; ++i) {
     kBucket.add({ id: Buffer.from('' + i) })
   }
   t.false(kBucket.bucket)
-  var contact1 = { id: Buffer.from('a'), vectorClock: 1 }
-  var contact2 = { id: Buffer.from('a'), vectorClock: 2 }
+  const contact1 = { id: Buffer.from('a'), vectorClock: 1 }
+  const contact2 = { id: Buffer.from('a'), vectorClock: 2 }
   kBucket.on('updated', function (oldContact, newContact) {
     t.same(oldContact, contact1)
     t.same(newContact, contact2)

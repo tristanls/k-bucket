@@ -209,7 +209,7 @@ class KBucket extends EventEmitter {
 
     let contacts = []
 
-    for (let nodes = [ this.root ], bitIndex = 0; nodes.length > 0 && contacts.length < n;) {
+    for (let nodes = [this.root], bitIndex = 0; nodes.length > 0 && contacts.length < n;) {
       const node = nodes.pop()
       if (node.contacts === null) {
         const detNode = this._determineNode(node, id, bitIndex++)
@@ -235,7 +235,7 @@ class KBucket extends EventEmitter {
   count () {
     // return this.toArray().length
     let count = 0
-    for (const nodes = [ this.root ]; nodes.length > 0;) {
+    for (const nodes = [this.root]; nodes.length > 0;) {
       const node = nodes.pop()
       if (node.contacts === null) nodes.push(node.right, node.left)
       else count += node.contacts.length
@@ -391,7 +391,7 @@ class KBucket extends EventEmitter {
    */
   toArray () {
     let result = []
-    for (const nodes = [ this.root ]; nodes.length > 0;) {
+    for (const nodes = [this.root]; nodes.length > 0;) {
       const node = nodes.pop()
       if (node.contacts === null) nodes.push(node.right, node.left)
       else result = result.concat(node.contacts)

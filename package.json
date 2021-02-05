@@ -38,11 +38,11 @@
     "unit": "tape test/*.js"
   },
   "dependencies": {
-    "randombytes": "^2.0.3"
+    "randombytes": "^2.1.0"
   },
   "devDependencies": {
-    "nyc": "^11.7.3",
-    "standard": "^11.0.1",
-    "tape": "^4.5.1"
+    "nyc": "^15.1.0",
+    "standard": "^16.0.3",
+    "tape": "^5.1.1"
   }
 }
