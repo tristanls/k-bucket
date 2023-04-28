@@ -39,7 +39,8 @@
     "unit": "tape test/*.js"
   },
   "dependencies": {
-    "randombytes": "^2.1.0"
+    "events": "^3.3.0",
+    "iso-random-stream": "^2.0.2"
   },
   "devDependencies": {
     "nyc": "^15.1.0",

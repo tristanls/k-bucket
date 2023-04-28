@@ -28,7 +28,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 'use strict'
 
-const randomBytes = require('randombytes')
+const { randomBytes } = require('iso-random-stream')
 const { EventEmitter } = require('events')
 
 /**
